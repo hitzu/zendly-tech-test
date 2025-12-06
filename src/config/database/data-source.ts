@@ -13,11 +13,13 @@ if (fs.existsSync(envPath)) {
 
 const url = process.env.SUPABASE_DB_URL;
 const isProduction = stage === 'production' || stage === 'prod';
+const schema = process.env.DB_SCHEMA || 'public';
 
 const baseConfig = url
   ? {
       type: 'postgres' as const,
       url,
+      schema,
       ssl: isProduction
         ? {
             rejectUnauthorized: false,
@@ -31,6 +33,7 @@ const baseConfig = url
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'postgres',
       database: process.env.DB_NAME || 'bookandsign_dev',
+      schema,
       ssl: isProduction ? { rejectUnauthorized: false } : false,
     };
 
@@ -53,5 +56,7 @@ export const AppDataSource = new DataSource({
     connectionTimeoutMillis: isProduction ? 10000 : 2000,
     idleTimeoutMillis: 30000,
     ssl: isProduction ? { rejectUnauthorized: false } : false,
+    // Set PostgreSQL search_path to use the specified schema
+    options: `-c search_path=${schema}`,
   },
 });

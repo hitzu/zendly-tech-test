@@ -86,6 +86,7 @@ jobs:
       NODE_VERSION: 22
       PNPM_VERSION: 9
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      DB_SCHEMA: ${{ vars.DB_SCHEMA }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -111,7 +112,9 @@ jobs:
       - name: Debug - Check SUPABASE_DB_URL
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DB_SCHEMA: ${{ vars.DB_SCHEMA }}
         run: |
+          echo "DB_SCHEMA adsasdasdasdasdasd: $DB_SCHEMA"
           if [ -z "$SUPABASE_DB_URL" ]; then
             echo "SUPABASE_DB_URL is EMPTY or NOT SET"
             echo ""
@@ -129,18 +132,21 @@ jobs:
         env:
           NODE_ENV: production
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DB_SCHEMA: ${{ vars.DB_SCHEMA }}
         run: pnpm run db:status
 
       - name: migrations:run
         env:
           NODE_ENV: production
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DB_SCHEMA: ${{ vars.DB_SCHEMA }}
         run: pnpm run db:run
 
       - name: migrations:status (after)
         env:
           NODE_ENV: production
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DB_SCHEMA: ${{ vars.DB_SCHEMA }}
         run: pnpm run db:status
 
   deploy:

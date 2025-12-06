@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "bookandsign",
+  "name": "zendly",
   "type": "collection",
   "ignore": [
     "node_modules",

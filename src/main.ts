@@ -32,8 +32,8 @@ async function bootstrap() {
     next();
   });
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Book and Sign API')
-    .setDescription('Book and Sign API description')
+    .setTitle('Zendly API')
+    .setDescription('Zendly API description')
     .addBearerAuth(
       {
         name: 'Authorization',
