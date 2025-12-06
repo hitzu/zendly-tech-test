@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { TokenService } from '../../token/token.service';
 
 // Lightweight dev-only guard: parses a simple dev token and attaches it to the request.
 export type DevTokenRole = 'OPERATOR' | 'MANAGER' | 'ADMIN';
@@ -27,9 +28,12 @@ const DEV_TOKEN_ROLES: DevTokenRole[] = ['OPERATOR', 'MANAGER', 'ADMIN'];
 export class DevTokenGuard implements CanActivate {
   private readonly logger = new Logger(DevTokenGuard.name);
 
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly tokenService: TokenService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -85,6 +89,17 @@ export class DevTokenGuard implements CanActivate {
       role: role as DevTokenRole,
       issuedAt,
     };
+
+    const tokenRecord = await this.tokenService.findActiveToken(rawToken);
+    if (!tokenRecord) {
+      this.logger.warn('Token not registered in store');
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    if (tokenRecord.operator && tokenRecord.operator.id !== operatorId) {
+      this.logger.warn('Token does not belong to provided operator');
+      throw new UnauthorizedException('Token operator mismatch');
+    }
 
     request.user = payload;
     this.logger.debug(

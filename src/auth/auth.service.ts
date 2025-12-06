@@ -7,13 +7,18 @@ import { DevLoginResponseDto } from './dto/dev-login-response.dto';
 import type { DevTokenRole } from './guards/dev-token.guard';
 import type { Operator } from '../operator/entities/operator.entity';
 import { OPERATOR_ROLES } from '../common/types/operator-roles.type';
+import { TokenService } from '../token/token.service';
+import { TOKEN_TYPE } from '../common/types/token-type';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   // Dev-only auth service. Do not use this implementation in production.
-  constructor(private readonly operatorsService: OperatorsService) {}
+  constructor(
+    private readonly operatorsService: OperatorsService,
+    private readonly tokenService: TokenService,
+  ) {}
 
   public async signup(
     createOperatorDto: CreateOperatorDto,
@@ -24,6 +29,7 @@ export class AuthService {
     const operator =
       await this.operatorsService.createOperator(createOperatorDto);
     const response = this.buildDevLoginResponse(operator);
+    await this.persistToken(response.token, operator.id);
 
     this.logger.log({ operatorId: operator.id }, 'Dev signup completed');
     return response;
@@ -38,6 +44,7 @@ export class AuthService {
       : await this.pickRandomOperator();
 
     const response = this.buildDevLoginResponse(operator);
+    await this.persistToken(response.token, operator.id);
 
     this.logger.log(
       {
@@ -104,5 +111,13 @@ export class AuthService {
 
   private buildTenantId(operator: Operator): string {
     return operator.tenantId;
+  }
+
+  private async persistToken(token: string, operatorId: string): Promise<void> {
+    await this.tokenService.registerToken({
+      token,
+      type: TOKEN_TYPE.ACCESS,
+      operatorId,
+    });
   }
 }

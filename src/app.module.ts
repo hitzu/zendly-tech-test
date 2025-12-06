@@ -10,6 +10,7 @@ import { getLoggerConfigs } from './config/logger/logger.config';
 import { AuthModule } from './auth/auth.module';
 import { OperatorsModule } from './operator/operators.module';
 import { DevTokenGuard } from './auth/guards/dev-token.guard';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DevTokenGuard } from './auth/guards/dev-token.guard';
     }),
     AuthModule,
     OperatorsModule,
+    TokenModule,
   ],
   controllers: [AppController],
   providers: [
