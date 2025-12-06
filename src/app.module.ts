@@ -8,7 +8,7 @@ import { getTypeOrmConfig } from './config/database';
 import { LoggerModule } from 'nestjs-pino';
 import { getLoggerConfigs } from './config/logger/logger.config';
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
+import { OperatorsModule } from './operator/operators.module';
 import { DevTokenGuard } from './auth/guards/dev-token.guard';
 
 @Module({
@@ -26,7 +26,7 @@ import { DevTokenGuard } from './auth/guards/dev-token.guard';
       useFactory: () => getTypeOrmConfig(),
     }),
     AuthModule,
-    UserModule,
+    OperatorsModule,
   ],
   controllers: [AppController],
   providers: [

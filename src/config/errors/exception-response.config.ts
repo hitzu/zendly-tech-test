@@ -1,7 +1,7 @@
 enum ErrorMessages {
   SIGNUP_EMAIL_IN_USE = 'SIGNUP_EMAIL_IN_USE',
   LOGIN_BAD_CREDENTIAL = 'LOGIN_BAD_CREDENTIAL',
-  USER_NOT_FOUND = 'USER_NOT_FOUND',
+  OPERATOR_NOT_FOUND = 'OPERATOR_NOT_FOUND',
   WRONG_OTP = 'WRONG_OTP',
   AUTHORIZATION_REQUIRED = 'AUTHORIZATION_REQUIRED',
   EMAIL_IS_NOT_VERIFIED = 'EMAIL_IS_NOT_VERIFIED',
@@ -28,9 +28,9 @@ export const EXCEPTION_RESPONSE: Record<
     code: 2,
     message: 'email or password is wrong',
   },
-  [ErrorMessages.USER_NOT_FOUND]: {
+  [ErrorMessages.OPERATOR_NOT_FOUND]: {
     code: 3,
-    message: 'user not found',
+    message: 'operator not found',
   },
 
   [ErrorMessages.WRONG_OTP]: {

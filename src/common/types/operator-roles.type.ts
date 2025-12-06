@@ -1,0 +1,5 @@
+export enum OPERATOR_ROLES {
+  OPERATOR = 'OPERATOR',
+  MANAGER = 'MANAGER',
+  ADMIN = 'ADMIN',
+}

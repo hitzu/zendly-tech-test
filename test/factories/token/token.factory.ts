@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 import { Factory } from '@jorgebodega/typeorm-factory';
 import { Token } from '../../../src/token/entities/token.entity';
 import { TOKEN_TYPE } from '../../../src/common/types/token-type';
-import { User } from '../../../src/user/entities/user.entity';
+import { Operator } from '../../../src/operator/entities/operator.entity';
 
 export class TokenFactory extends Factory<Token> {
   protected entity = Token;
@@ -19,16 +19,16 @@ export class TokenFactory extends Factory<Token> {
     return {
       token: faker.string.alphanumeric(100),
       type: faker.helpers.arrayElement<TOKEN_TYPE>(Object.values(TOKEN_TYPE)),
-      // user should be provided via makeForUser or createForUser methods
+      // operator should be provided via makeForOperator or createForOperator methods
     };
   }
 
   /**
-   * Creates a token with a specific user
+   * Creates a token with a specific operator
    */
-  async makeForUser(user: User, type?: TOKEN_TYPE): Promise<Token> {
+  async makeForOperator(operator: Operator, type?: TOKEN_TYPE): Promise<Token> {
     return this.make({
-      user,
+      operator,
       type:
         type ||
         faker.helpers.arrayElement<TOKEN_TYPE>(Object.values(TOKEN_TYPE)),
@@ -36,10 +36,13 @@ export class TokenFactory extends Factory<Token> {
   }
 
   /**
-   * Creates and persists a token for a specific user
+   * Creates and persists a token for a specific operator
    */
-  async createForUser(user: User, type?: TOKEN_TYPE): Promise<Token> {
-    const token = await this.makeForUser(user, type);
+  async createForOperator(
+    operator: Operator,
+    type?: TOKEN_TYPE,
+  ): Promise<Token> {
+    const token = await this.makeForOperator(operator, type);
     return this.dataSource.getRepository(Token).save(token);
   }
 }

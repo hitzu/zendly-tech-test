@@ -7,28 +7,31 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { CreateOperatorDto } from '../operator/dto/create-operator.dto';
 import { AuthService } from './auth.service';
 import { DevLoginResponseDto } from './dto/dev-login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { Public } from './decorators/public.decorator';
-import { SignupDto } from '../user/dto/signup.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // Dev-only signup helper to quickly seed users in testing environments.
+  // Dev-only signup helper to quickly seed operators in testing environments.
   @Public()
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Dev signup for testing (NOT production ready)' })
   @ApiCreatedResponse({
-    description: 'User created with a dev token',
+    description: 'Operator created with a dev token',
     type: DevLoginResponseDto,
   })
-  async signup(@Body() signupDto: SignupDto): Promise<DevLoginResponseDto> {
-    return this.authService.signup(signupDto);
+  async signup(
+    @Body() createOperatorDto: CreateOperatorDto,
+  ): Promise<DevLoginResponseDto> {
+    return this.authService.signup(createOperatorDto);
   }
 
   @Public()

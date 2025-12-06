@@ -5,7 +5,7 @@ export class LoginDto {
   @ApiProperty({
     required: false,
     description: 'Optional operator id to log in as. If omitted, a random operator is used.',
-    example: '42',
+    example: '1d2c3b4a-5678-90ab-cdef-1234567890ab',
   })
   @IsOptional()
   @IsString()

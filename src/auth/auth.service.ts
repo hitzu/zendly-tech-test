@@ -1,38 +1,31 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EXCEPTION_RESPONSE } from 'src/config/errors/exception-response.config';
 import { LoginDto } from './dto/login.dto';
-import { SignupDto } from '../user/dto/signup.dto';
-import { UserService } from '../user/user.service';
+import { CreateOperatorDto } from '../operator/dto/create-operator.dto';
+import { OperatorsService } from '../operator/operators.service';
 import { DevLoginResponseDto } from './dto/dev-login-response.dto';
 import type { DevTokenRole } from './guards/dev-token.guard';
-import type { User } from '../user/entities/user.entity';
-import { USER_ROLES } from '../common/types/user-roles.type';
+import type { Operator } from '../operator/entities/operator.entity';
+import { OPERATOR_ROLES } from '../common/types/operator-roles.type';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   // Dev-only auth service. Do not use this implementation in production.
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly operatorsService: OperatorsService) {}
 
-  public async signup(signupDto: SignupDto): Promise<DevLoginResponseDto> {
-    const { email } = signupDto;
-    this.logger.log({ email }, 'Dev signup requested (test-only)');
+  public async signup(
+    createOperatorDto: CreateOperatorDto,
+  ): Promise<DevLoginResponseDto> {
+    const { tenantId } = createOperatorDto;
+    this.logger.log({ tenantId }, 'Dev signup requested (test-only)');
 
-    const existingUser = await this.userService.findUserByEmail(email);
-    if (existingUser) {
-      throw new ConflictException(EXCEPTION_RESPONSE.SIGNUP_EMAIL_IN_USE);
-    }
+    const operator =
+      await this.operatorsService.createOperator(createOperatorDto);
+    const response = this.buildDevLoginResponse(operator);
 
-    const user = await this.userService.createNewUser(signupDto);
-    const response = this.buildDevLoginResponse(user);
-
-    this.logger.log({ userId: user.id }, 'Dev signup completed');
+    this.logger.log({ operatorId: operator.id }, 'Dev signup completed');
     return response;
   }
 
@@ -57,43 +50,34 @@ export class AuthService {
     return response;
   }
 
-  private async findOperatorById(operatorId: string): Promise<User> {
-    const parsedId = Number(operatorId);
-    if (Number.isNaN(parsedId)) {
-      this.logger.error(
-        { operatorId },
-        'Operator id must be a numeric string for dev login',
-      );
-      throw new NotFoundException(EXCEPTION_RESPONSE.USER_NOT_FOUND);
-    }
-
-    const operator = await this.userService.findUserById(parsedId);
+  private async findOperatorById(operatorId: string): Promise<Operator> {
+    const operator = await this.operatorsService.findOperatorById(operatorId);
     if (!operator) {
       this.logger.error(
         { operatorId },
         'Operator not found for provided operatorId',
       );
-      throw new NotFoundException(EXCEPTION_RESPONSE.USER_NOT_FOUND);
+      throw new NotFoundException(EXCEPTION_RESPONSE.OPERATOR_NOT_FOUND);
     }
 
     return operator;
   }
 
-  private async pickRandomOperator(): Promise<User> {
-    const operators = await this.userService.findAllUsers();
+  private async pickRandomOperator(): Promise<Operator> {
+    const operators = await this.operatorsService.findAllOperators();
     if (!operators.length) {
       this.logger.error('No operators available for dev login');
-      throw new NotFoundException(EXCEPTION_RESPONSE.USER_NOT_FOUND);
+      throw new NotFoundException(EXCEPTION_RESPONSE.OPERATOR_NOT_FOUND);
     }
 
     const randomIndex = Math.floor(Math.random() * operators.length);
     return operators[randomIndex];
   }
 
-  private buildDevLoginResponse(user: User): DevLoginResponseDto {
-    const role = this.mapUserRoleToDevRole(user.role);
-    const tenantId = this.buildTenantId(user);
-    const operatorId = String(user.id);
+  private buildDevLoginResponse(operator: Operator): DevLoginResponseDto {
+    const role = this.mapOperatorRoleToDevRole(operator.role);
+    const tenantId = this.buildTenantId(operator);
+    const operatorId = String(operator.id);
     const timestamp = Math.floor(Date.now() / 1000);
 
     const token = `DEV.v1.${tenantId}.${operatorId}.${role}.${timestamp}`;
@@ -106,20 +90,19 @@ export class AuthService {
     };
   }
 
-  private mapUserRoleToDevRole(userRole: USER_ROLES): DevTokenRole {
-    if (userRole === USER_ROLES.ADMIN) {
+  private mapOperatorRoleToDevRole(operatorRole: OPERATOR_ROLES): DevTokenRole {
+    if (operatorRole === OPERATOR_ROLES.ADMIN) {
       return 'ADMIN';
     }
 
-    if (userRole === USER_ROLES.VIEWER) {
+    if (operatorRole === OPERATOR_ROLES.MANAGER) {
       return 'MANAGER';
     }
 
     return 'OPERATOR';
   }
 
-  private buildTenantId(user: User): string {
-    // No tenant concept exists yet, so derive a stable dev-only tenant id from the user.
-    return `tenant-${user.id}`;
+  private buildTenantId(operator: Operator): string {
+    return operator.tenantId;
   }
 }

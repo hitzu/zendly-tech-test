@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TOKEN_TYPE } from '../../common/types/token-type';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
-import { User } from '../../user/entities/user.entity';
+import { Operator } from '../../operator/entities/operator.entity';
 
 @Entity({ name: 'token' })
 export class Token extends BaseTimeEntity {
@@ -16,7 +16,7 @@ export class Token extends BaseTimeEntity {
   })
   type: TOKEN_TYPE;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'user_id' })
-  user?: User | null;
+  @ManyToOne(() => Operator, { nullable: true })
+  @JoinColumn({ name: 'operator_id' })
+  operator?: Operator | null;
 }
