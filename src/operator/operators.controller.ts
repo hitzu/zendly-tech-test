@@ -24,6 +24,7 @@ import { CreateOperatorDto } from './dto/create-operator.dto';
 import { OperatorResponseDto } from './dto/operator-response.dto';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
 import { OperatorsService } from './operators.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Operators')
 @Controller('operators')
@@ -61,6 +62,7 @@ export class OperatorsController {
   }
 
   @Post()
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create operator' })
   @ApiCreatedResponse({ type: OperatorResponseDto })

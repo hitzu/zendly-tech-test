@@ -61,4 +61,3 @@ describe('OperatorsService', () => {
     expect(Array.isArray(operators)).toBe(true);
   });
 });
-
