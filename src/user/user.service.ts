@@ -34,4 +34,24 @@ export class UserService {
       throw error;
     }
   }
+
+  async findUserById(id: number): Promise<User | null> {
+    try {
+      this.logger.log({ id }, 'Finding user by id');
+      return this.userRepository.findOne({ where: { id } });
+    } catch (error) {
+      this.logger.error(error, 'Error finding user by id');
+      throw error;
+    }
+  }
+
+  async findAllUsers(): Promise<User[]> {
+    try {
+      this.logger.log('Fetching all users for dev login');
+      return this.userRepository.find();
+    } catch (error) {
+      this.logger.error(error, 'Error fetching all users');
+      throw error;
+    }
+  }
 }

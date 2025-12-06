@@ -9,8 +9,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { getLoggerConfigs } from './config/logger/logger.config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { TokenModule } from './token/token.module';
-import { AuthGuard } from './auth/auth.guard';
+import { DevTokenGuard } from './auth/guards/dev-token.guard';
 
 @Module({
   imports: [
@@ -28,14 +27,13 @@ import { AuthGuard } from './auth/auth.guard';
     }),
     AuthModule,
     UserModule,
-    TokenModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: DevTokenGuard,
     },
   ],
 })
