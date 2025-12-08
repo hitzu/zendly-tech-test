@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { OperatorsModule } from './operator/operators.module';
 import { DevTokenGuard } from './auth/guards/dev-token.guard';
 import { TokenModule } from './token/token.module';
+import { InboxesModule } from './inboxes/inboxes.module';
+import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions/operator-inbox-subscriptions.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { TokenModule } from './token/token.module';
     AuthModule,
     OperatorsModule,
     TokenModule,
+    InboxesModule,
+    OperatorInboxSubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [

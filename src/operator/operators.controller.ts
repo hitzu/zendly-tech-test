@@ -50,7 +50,7 @@ export class OperatorsController {
   @ApiOperation({ summary: 'Get operator by id' })
   @ApiOkResponse({ type: OperatorResponseDto })
   @ApiNotFoundResponse({ description: 'Operator not found' })
-  async findOne(@Param('id') id: string): Promise<OperatorResponseDto> {
+  async findOne(@Param('id') id: number): Promise<OperatorResponseDto> {
     this.logger.info({ operatorId: id }, 'Requesting operator by id');
     const operator = await this.operatorsService.findOperatorById(id);
     if (!operator) {
@@ -84,7 +84,7 @@ export class OperatorsController {
   @ApiOkResponse({ type: OperatorResponseDto })
   @ApiNotFoundResponse({ description: 'Operator not found' })
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateOperatorDto: UpdateOperatorDto,
   ): Promise<OperatorResponseDto> {
     this.logger.info(

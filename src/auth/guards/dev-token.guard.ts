@@ -14,8 +14,8 @@ import { TokenService } from '../../token/token.service';
 export type DevTokenRole = 'OPERATOR' | 'MANAGER' | 'ADMIN';
 
 export interface DevTokenPayload {
-  tenantId: string;
-  operatorId: string;
+  tenantId: number;
+  operatorId: number;
   role: DevTokenRole;
   issuedAt: number;
 }
@@ -84,8 +84,8 @@ export class DevTokenGuard implements CanActivate {
     }
 
     const payload: DevTokenPayload = {
-      tenantId,
-      operatorId,
+      tenantId: Number(tenantId),
+      operatorId: Number(operatorId),
       role: role as DevTokenRole,
       issuedAt,
     };
@@ -96,7 +96,10 @@ export class DevTokenGuard implements CanActivate {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    if (tokenRecord.operator && tokenRecord.operator.id !== operatorId) {
+    if (
+      tokenRecord.operator &&
+      tokenRecord.operator.id !== Number(operatorId)
+    ) {
       this.logger.warn('Token does not belong to provided operator');
       throw new UnauthorizedException('Token operator mismatch');
     }

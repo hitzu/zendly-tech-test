@@ -1,11 +1,6 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { randomUUID } from 'crypto';
 
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
@@ -20,20 +15,32 @@ export class OperatorsService {
     private readonly operatorRepository: Repository<Operator>,
   ) {}
 
-  async createOperator(createOperatorDto: CreateOperatorDto): Promise<Operator> {
-    this.logger.log({ tenantId: createOperatorDto.tenantId }, 'Creating operator');
+  async createOperator(
+    createOperatorDto: CreateOperatorDto,
+  ): Promise<Operator> {
+    this.logger.log(
+      { tenantId: createOperatorDto.tenantId },
+      'Creating operator',
+    );
 
-    const operator = this.operatorRepository.create({
-      ...createOperatorDto,
-      id: randomUUID(),
-    });
+    const operator = this.operatorRepository.create(createOperatorDto);
 
     return this.operatorRepository.save(operator);
   }
 
-  async findOperatorById(id: string): Promise<Operator | null> {
+  async findOperatorById(id: number): Promise<Operator | null> {
     this.logger.log({ operatorId: id }, 'Fetching operator by id');
     return this.operatorRepository.findOne({ where: { id } });
+  }
+
+  async getOperatorById(id: number): Promise<Operator> {
+    this.logger.log({ operatorId: id }, 'Fetching operator by id');
+    const operator = await this.operatorRepository.findOne({ where: { id } });
+    if (!operator) {
+      this.logger.error({ operatorId: id }, 'Operator not found');
+      throw new NotFoundException('Operator not found');
+    }
+    return operator;
   }
 
   async findAllOperators(): Promise<Operator[]> {
@@ -42,7 +49,7 @@ export class OperatorsService {
   }
 
   async updateOperator(
-    id: string,
+    id: number,
     updateOperatorDto: UpdateOperatorDto,
   ): Promise<Operator> {
     this.logger.log({ operatorId: id }, 'Updating operator');

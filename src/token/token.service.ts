@@ -9,7 +9,7 @@ import type { Operator } from '../operator/entities/operator.entity';
 interface RegisterTokenParams {
   token: string;
   type: TOKEN_TYPE;
-  operatorId?: string | null;
+  operatorId?: number | null;
 }
 
 @Injectable()
@@ -47,4 +47,3 @@ export class TokenService {
     });
   }
 }
-

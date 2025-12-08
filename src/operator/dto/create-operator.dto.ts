@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 import { OPERATOR_ROLES } from '../../common/types/operator-roles.type';
 
@@ -17,8 +17,8 @@ export class CreateOperatorDto {
     example: 'tenant-123',
   })
   @IsNotEmpty()
-  @IsString()
-  tenantId!: string;
+  @IsNumber()
+  tenantId!: number;
 
   @ApiProperty({
     description: 'Role assigned to the operator',

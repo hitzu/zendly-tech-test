@@ -40,7 +40,7 @@ export class AuthService {
     this.logger.log({ operatorId }, 'Dev login requested (test-only)');
 
     const operator = operatorId
-      ? await this.findOperatorById(operatorId)
+      ? await this.operatorsService.getOperatorById(operatorId)
       : await this.pickRandomOperator();
 
     const response = this.buildDevLoginResponse(operator);
@@ -57,19 +57,6 @@ export class AuthService {
     return response;
   }
 
-  private async findOperatorById(operatorId: string): Promise<Operator> {
-    const operator = await this.operatorsService.findOperatorById(operatorId);
-    if (!operator) {
-      this.logger.error(
-        { operatorId },
-        'Operator not found for provided operatorId',
-      );
-      throw new NotFoundException(EXCEPTION_RESPONSE.OPERATOR_NOT_FOUND);
-    }
-
-    return operator;
-  }
-
   private async pickRandomOperator(): Promise<Operator> {
     const operators = await this.operatorsService.findAllOperators();
     if (!operators.length) {
@@ -84,7 +71,7 @@ export class AuthService {
   private buildDevLoginResponse(operator: Operator): DevLoginResponseDto {
     const role = this.mapOperatorRoleToDevRole(operator.role);
     const tenantId = this.buildTenantId(operator);
-    const operatorId = String(operator.id);
+    const operatorId = operator.id;
     const timestamp = Math.floor(Date.now() / 1000);
 
     const token = `DEV.v1.${tenantId}.${operatorId}.${role}.${timestamp}`;
@@ -109,11 +96,11 @@ export class AuthService {
     return 'OPERATOR';
   }
 
-  private buildTenantId(operator: Operator): string {
+  private buildTenantId(operator: Operator): number {
     return operator.tenantId;
   }
 
-  private async persistToken(token: string, operatorId: string): Promise<void> {
+  private async persistToken(token: string, operatorId: number): Promise<void> {
     await this.tokenService.registerToken({
       token,
       type: TOKEN_TYPE.ACCESS,

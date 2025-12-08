@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 import type { DevTokenRole } from '../guards/dev-token.guard';
 
 export class DevLoginResponseDto {
@@ -12,14 +12,14 @@ export class DevLoginResponseDto {
   token!: string;
 
   @ApiProperty({ example: '42' })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  operatorId!: string;
+  operatorId!: number;
 
   @ApiProperty({ example: 'tenant-123' })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  tenantId!: string;
+  tenantId!: number;
 
   @ApiProperty({
     example: 'OPERATOR',
@@ -29,4 +29,3 @@ export class DevLoginResponseDto {
   @IsIn(['OPERATOR', 'MANAGER', 'ADMIN'])
   role!: DevTokenRole;
 }
-
