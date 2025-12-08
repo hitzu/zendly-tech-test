@@ -14,6 +14,7 @@ import { TokenModule } from './tokens/token.module';
 import { InboxesModule } from './inboxes/inboxes.module';
 import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions/operator-inbox-subscriptions.module';
 import { TenantsModule } from './tenants/tenants.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TenantsModule } from './tenants/tenants.module';
     InboxesModule,
     OperatorInboxSubscriptionsModule,
     TenantsModule,
+    ConversationsModule,
   ],
   controllers: [AppController],
   providers: [

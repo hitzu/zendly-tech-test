@@ -1,0 +1,147 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { ConversationState } from './conversation-state.enum';
+import { ConversationRef } from './entities/conversation-ref.entity';
+import { CreateConversationDto } from './dto/create-conversation.dto';
+import { UpdateConversationDto } from './dto/update-conversation.dto';
+import type {
+  QueryConversationsDto,
+  ConversationSort,
+} from './dto/query-conversations.dto';
+
+@Injectable()
+export class ConversationsService {
+  constructor(
+    @InjectRepository(ConversationRef)
+    private readonly conversationRepository: Repository<ConversationRef>,
+  ) {}
+
+  async list(
+    tenantId: number,
+    query: QueryConversationsDto,
+  ): Promise<ConversationRef[]> {
+    const {
+      inboxId,
+      state,
+      assignedOperatorId,
+      labelId,
+      sort = 'newest',
+      limit = 20,
+      offset,
+      page,
+    } = query;
+    const safeLimit = Math.min(limit, 100);
+    const start = page ? (page - 1) * safeLimit : (offset ?? 0);
+    const qb = this.conversationRepository.createQueryBuilder('conversation');
+    qb.where('conversation.tenant_id = :tenantId', { tenantId });
+    if (inboxId) {
+      qb.andWhere('conversation.inbox_id = :inboxId', {
+        inboxId: Number(inboxId),
+      });
+    }
+    if (state) {
+      qb.andWhere('conversation.state = :state', { state });
+    }
+    if (assignedOperatorId) {
+      qb.andWhere('conversation.assigned_operator_id = :assignedOperatorId', {
+        assignedOperatorId: Number(assignedOperatorId),
+      });
+    }
+    if (labelId) {
+      // TODO: integrate label filtering once labels are modeled
+    }
+
+    this.applySorting(qb, sort);
+    qb.take(safeLimit).skip(start);
+    return qb.getMany();
+  }
+
+  async findById(
+    tenantId: number,
+    id: number,
+  ): Promise<ConversationRef | null> {
+    return this.conversationRepository.findOne({
+      where: { tenantId, id },
+    });
+  }
+
+  async upsert(
+    tenantId: number,
+    dto: CreateConversationDto,
+  ): Promise<ConversationRef> {
+    const existing = await this.conversationRepository.findOne({
+      where: {
+        tenantId,
+        externalConversationId: dto.externalConversationId,
+      },
+    });
+    if (existing) {
+      // Upsert behavior: update core metadata if conversation already exists.
+      existing.inboxId = Number(dto.inboxId);
+      existing.customerPhoneNumber = dto.customerPhoneNumber;
+      existing.lastMessageAt =
+        dto.lastMessageAt ?? existing.lastMessageAt ?? null;
+      existing.messageCount = dto.messageCount ?? existing.messageCount ?? 0;
+      existing.updatedAt = new Date();
+      return this.conversationRepository.save(existing);
+    }
+    const conversation = this.conversationRepository.create({
+      tenantId,
+      inboxId: Number(dto.inboxId),
+      externalConversationId: dto.externalConversationId,
+      customerPhoneNumber: dto.customerPhoneNumber,
+      state: ConversationState.QUEUED,
+      assignedOperatorId: null,
+      lastMessageAt: dto.lastMessageAt ?? null,
+      messageCount: dto.messageCount ?? 0,
+      priorityScore: 0,
+      resolvedAt: null,
+    });
+    return this.conversationRepository.save(conversation);
+  }
+
+  async updateMetadata(
+    tenantId: number,
+    id: number,
+    dto: UpdateConversationDto,
+  ): Promise<ConversationRef | undefined> {
+    const existing = await this.findById(tenantId, id);
+    if (!existing) {
+      return undefined;
+    }
+    if (dto.lastMessageAt !== undefined) {
+      existing.lastMessageAt = dto.lastMessageAt;
+    }
+    if (dto.messageCount !== undefined) {
+      existing.messageCount = dto.messageCount;
+    }
+    if (dto.priorityScore !== undefined) {
+      existing.priorityScore = dto.priorityScore;
+    }
+    if (dto.customerPhoneNumber !== undefined) {
+      existing.customerPhoneNumber = dto.customerPhoneNumber;
+    }
+    existing.updatedAt = new Date();
+    return this.conversationRepository.save(existing);
+  }
+
+  private applySorting(
+    qb: ReturnType<Repository<ConversationRef>['createQueryBuilder']>,
+    sort: ConversationSort,
+  ): void {
+    if (sort === 'oldest') {
+      qb.orderBy('conversation.created_at', 'ASC');
+      return;
+    }
+    if (sort === 'priority') {
+      qb.orderBy('conversation.priority_score', 'DESC').addOrderBy(
+        'conversation.last_message_at',
+        'DESC',
+      );
+      return;
+    }
+    qb.orderBy('conversation.created_at', 'DESC');
+  }
+}
