@@ -118,26 +118,15 @@ export class InboxesService {
       throw new NotFoundException('Inbox not found');
     }
 
-    if (
-      updateInboxDto.phoneNumber &&
-      (await this.listByTenant(tenantId)).some(
-        (candidate) =>
-          candidate.tenantId === tenantId &&
-          candidate.id !== id &&
-          candidate.phoneNumber === updateInboxDto.phoneNumber &&
-          candidate.active,
-      )
-    ) {
-      throw new BadRequestException(
-        'Phone number already used by another inbox in this tenant',
-      );
+    await this.inboxRepository.update(id, {
+      ...updateInboxDto,
+    });
+
+    const updatedInbox = await this.findById(tenantId, id);
+    if (!updatedInbox) {
+      throw new NotFoundException('Inbox not found');
     }
-
-    inbox.displayName = updateInboxDto.displayName ?? inbox.displayName;
-    inbox.phoneNumber = updateInboxDto.phoneNumber ?? inbox.phoneNumber;
-    inbox.updatedAt = new Date();
-
-    return inbox;
+    return updatedInbox;
   }
 
   async removeInbox(tenantId: number, id: number): Promise<void> {
