@@ -29,7 +29,6 @@ import { CreateInboxDto } from './dto/create-inbox.dto';
 import { UpdateInboxDto } from './dto/update-inbox.dto';
 import { InboxResponseDto } from './dto/inbox-response.dto';
 import { InboxesService } from './inboxes.service';
-import { OperatorInboxSubscriptionsService } from '../operator-inbox-subscriptions/operator-inbox-subscriptions.service';
 
 type AuthedRequest = Request & { user?: DevTokenPayload };
 
@@ -38,7 +37,6 @@ type AuthedRequest = Request & { user?: DevTokenPayload };
 export class InboxesController {
   constructor(
     private readonly inboxesService: InboxesService,
-    private readonly operatorInboxSubscriptionsService: OperatorInboxSubscriptionsService,
     @InjectPinoLogger(InboxesController.name)
     private readonly logger: PinoLogger,
   ) {}

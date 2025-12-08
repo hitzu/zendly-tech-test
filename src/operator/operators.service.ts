@@ -24,6 +24,7 @@ export class OperatorsService {
     );
 
     const operator = this.operatorRepository.create(createOperatorDto);
+    this.logger.log({ operator }, 'Operator created');
 
     return this.operatorRepository.save(operator);
   }

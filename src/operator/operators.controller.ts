@@ -18,7 +18,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { Logger } from '@nestjs/common';
 
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { OperatorResponseDto } from './dto/operator-response.dto';
@@ -29,18 +29,16 @@ import { Public } from '../auth/decorators/public.decorator';
 @ApiTags('Operators')
 @Controller('operators')
 export class OperatorsController {
-  constructor(
-    private readonly operatorsService: OperatorsService,
-    @InjectPinoLogger(OperatorsController.name)
-    private readonly logger: PinoLogger,
-  ) {}
+  private readonly logger = new Logger(OperatorsController.name);
+
+  constructor(private readonly operatorsService: OperatorsService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List operators' })
   @ApiOkResponse({ type: [OperatorResponseDto] })
   async findAll(): Promise<OperatorResponseDto[]> {
-    this.logger.info('Requesting operator list');
+    this.logger.log('Requesting operator list');
     const operators = await this.operatorsService.findAllOperators();
     return operators.map((operator) => new OperatorResponseDto(operator));
   }
@@ -51,7 +49,7 @@ export class OperatorsController {
   @ApiOkResponse({ type: OperatorResponseDto })
   @ApiNotFoundResponse({ description: 'Operator not found' })
   async findOne(@Param('id') id: number): Promise<OperatorResponseDto> {
-    this.logger.info({ operatorId: id }, 'Requesting operator by id');
+    this.logger.log({ operatorId: id }, 'Requesting operator by id');
     const operator = await this.operatorsService.findOperatorById(id);
     if (!operator) {
       this.logger.error({ operatorId: id }, 'Operator not found');
@@ -69,7 +67,7 @@ export class OperatorsController {
   async create(
     @Body() createOperatorDto: CreateOperatorDto,
   ): Promise<OperatorResponseDto> {
-    this.logger.info(
+    this.logger.log(
       { tenantId: createOperatorDto.tenantId },
       'Creating operator',
     );
@@ -87,7 +85,7 @@ export class OperatorsController {
     @Param('id') id: number,
     @Body() updateOperatorDto: UpdateOperatorDto,
   ): Promise<OperatorResponseDto> {
-    this.logger.info(
+    this.logger.log(
       { operatorId: id, update: updateOperatorDto },
       'Updating operator',
     );
@@ -104,7 +102,7 @@ export class OperatorsController {
   @ApiNoContentResponse()
   @ApiNotFoundResponse({ description: 'Operator not found' })
   async remove(@Param('id') id: string): Promise<void> {
-    this.logger.info({ operatorId: id }, 'Deleting operator');
+    this.logger.log({ operatorId: id }, 'Deleting operator');
     await this.operatorsService.removeOperator(id);
   }
 }
