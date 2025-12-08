@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 
 import { Inbox } from '../inboxes/entities/inbox.entity';
-import { Operator } from '../operator/entities/operator.entity';
+import { Operator } from '../operators/entities/operator.entity';
 import { CreateOperatorInboxSubscriptionDto } from './dto/create-operator-inbox-subscription.dto';
 import { OperatorInboxSubscription } from './entities/operator-inbox-subscription.entity';
 import { EXCEPTION_RESPONSE } from 'src/config/errors/exception-response.config';

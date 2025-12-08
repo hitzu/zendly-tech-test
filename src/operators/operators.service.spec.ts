@@ -3,17 +3,21 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { OperatorFactory } from '../../test/factories/operator/operator.factory';
+import { TenantFactory } from '../../test/factories/tenant/tenant.factory';
 import { OPERATOR_ROLES } from '../common/types/operator-roles.type';
 import { AppDataSource as TestDataSource } from '../config/database/data-source';
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
 import { Operator } from './entities/operator.entity';
 import { OperatorsService } from './operators.service';
+import { Tenant } from '../tenants/entities/tenant.entity';
 
 describe('OperatorsService', () => {
   let service: OperatorsService;
   let repository: Repository<Operator>;
   let operatorFactory: OperatorFactory;
+  let tenantFactory: TenantFactory;
+  let tenantRepository: Repository<Tenant>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,12 +33,16 @@ describe('OperatorsService', () => {
     service = module.get<OperatorsService>(OperatorsService);
     repository = module.get<Repository<Operator>>(getRepositoryToken(Operator));
     operatorFactory = new OperatorFactory(TestDataSource);
+    tenantFactory = new TenantFactory(TestDataSource);
+    tenantRepository = TestDataSource.getRepository(Tenant);
   });
 
   it('creates an operator with generated id', async () => {
+    const tenant = await tenantRepository.save(await tenantFactory.make());
+
     const dto: CreateOperatorDto = {
       name: 'Jane Operator',
-      tenantId: 'tenant-1',
+      tenantId: tenant.id,
       role: OPERATOR_ROLES.OPERATOR,
     };
 
@@ -47,7 +55,8 @@ describe('OperatorsService', () => {
   });
 
   it('updates an operator', async () => {
-    const existing = await repository.save(await operatorFactory.make());
+    const tenant = await tenantRepository.save(await tenantFactory.make());
+    const existing = await operatorFactory.make({ tenantId: tenant.id });
 
     const update: UpdateOperatorDto = { name: 'Updated Name' };
     const updated = await service.updateOperator(existing.id, update);

@@ -1,13 +1,13 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EXCEPTION_RESPONSE } from 'src/config/errors/exception-response.config';
 import { LoginDto } from './dto/login.dto';
-import { CreateOperatorDto } from '../operator/dto/create-operator.dto';
-import { OperatorsService } from '../operator/operators.service';
+import { CreateOperatorDto } from '../operators/dto/create-operator.dto';
+import { OperatorsService } from '../operators/operators.service';
 import { DevLoginResponseDto } from './dto/dev-login-response.dto';
 import type { DevTokenRole } from './guards/dev-token.guard';
-import type { Operator } from '../operator/entities/operator.entity';
+import type { Operator } from '../operators/entities/operator.entity';
 import { OPERATOR_ROLES } from '../common/types/operator-roles.type';
-import { TokenService } from '../token/token.service';
+import { TokenService } from '../tokens/token.service';
 import { TOKEN_TYPE } from '../common/types/token-type';
 
 @Injectable()

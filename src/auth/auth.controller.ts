@@ -8,7 +8,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { CreateOperatorDto } from '../operator/dto/create-operator.dto';
+import { CreateOperatorDto } from '../operators/dto/create-operator.dto';
 import { AuthService } from './auth.service';
 import { DevLoginResponseDto } from './dto/dev-login-response.dto';
 import { LoginDto } from './dto/login.dto';

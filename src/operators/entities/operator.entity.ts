@@ -1,9 +1,10 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 import { OPERATOR_ROLES } from '../../common/types/operator-roles.type';
-import { Token } from '../../token/entities/token.entity';
+import { Token } from '../../tokens/entities/token.entity';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
 import { OperatorInboxSubscription } from '../../operator-inbox-subscriptions/entities/operator-inbox-subscription.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
 
 @Entity('operators')
 export class Operator extends BaseTimeEntity {
@@ -28,4 +29,10 @@ export class Operator extends BaseTimeEntity {
     (subscription) => subscription.operator,
   )
   inboxSubscriptions?: OperatorInboxSubscription[];
+
+  @ManyToOne(() => Tenant, (tenant) => tenant.operators, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'tenant_id' })
+  tenant?: Tenant;
 }

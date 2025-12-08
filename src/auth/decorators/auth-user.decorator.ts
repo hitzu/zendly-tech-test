@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { DecodedTokenDto } from '../../token/dto/decode-token.dto';
+import { DecodedTokenDto } from '../../tokens/dto/decode-token.dto';
 
 interface AuthenticatedRequest extends Request {
   user: DecodedTokenDto;

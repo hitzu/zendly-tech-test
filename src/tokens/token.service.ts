@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { TOKEN_TYPE } from '../common/types/token-type';
 import { Token } from './entities/token.entity';
-import type { Operator } from '../operator/entities/operator.entity';
+import type { Operator } from '../operators/entities/operator.entity';
 
 interface RegisterTokenParams {
   token: string;

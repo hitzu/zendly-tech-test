@@ -8,11 +8,12 @@ import { getTypeOrmConfig } from './config/database';
 import { LoggerModule } from 'nestjs-pino';
 import { getLoggerConfigs } from './config/logger/logger.config';
 import { AuthModule } from './auth/auth.module';
-import { OperatorsModule } from './operator/operators.module';
+import { OperatorsModule } from './operators/operators.module';
 import { DevTokenGuard } from './auth/guards/dev-token.guard';
-import { TokenModule } from './token/token.module';
+import { TokenModule } from './tokens/token.module';
 import { InboxesModule } from './inboxes/inboxes.module';
 import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions/operator-inbox-subscriptions.module';
+import { TenantsModule } from './tenants/tenants.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions
     TokenModule,
     InboxesModule,
     OperatorInboxSubscriptionsModule,
+    TenantsModule,
   ],
   controllers: [AppController],
   providers: [

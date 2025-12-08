@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{base_url}}/inboxes
+  url: {{base_url}}/operator-inbox-subscriptions
   body: json
   auth: inherit
 }
@@ -16,10 +16,9 @@ headers {
 
 body:json {
   {
-    "phoneNumber": "+12025550124",
-    "displayName": "Sales Team"
+    "operatorId":2,
+    "inboxId":1
   }
-  
 }
 
 settings {

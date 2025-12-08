@@ -4,7 +4,7 @@ import { Factory } from '@jorgebodega/typeorm-factory';
 import { DataSource } from 'typeorm';
 
 import { OPERATOR_ROLES } from '../../../src/common/types/operator-roles.type';
-import { Operator } from '../../../src/operator/entities/operator.entity';
+import { Operator } from '../../../src/operators/entities/operator.entity';
 
 export class OperatorFactory extends Factory<Operator> {
   protected entity = Operator;
@@ -17,9 +17,7 @@ export class OperatorFactory extends Factory<Operator> {
 
   protected attrs(): FactorizedAttrs<Operator> {
     return {
-      id: faker.string.uuid(),
       name: faker.person.fullName(),
-      tenantId: faker.string.alphanumeric(10),
       role: faker.helpers.arrayElement<OPERATOR_ROLES>(
         Object.values(OPERATOR_ROLES),
       ),

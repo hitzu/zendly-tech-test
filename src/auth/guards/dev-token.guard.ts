@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { TokenService } from '../../token/token.service';
+import { TokenService } from '../../tokens/token.service';
 
 // Lightweight dev-only guard: parses a simple dev token and attaches it to the request.
 export type DevTokenRole = 'OPERATOR' | 'MANAGER' | 'ADMIN';

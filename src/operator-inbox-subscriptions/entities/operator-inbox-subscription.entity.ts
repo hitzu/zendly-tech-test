@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
 
 import { Inbox } from '../../inboxes/entities/inbox.entity';
-import { Operator } from '../../operator/entities/operator.entity';
+import { Operator } from '../../operators/entities/operator.entity';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
 
 @Entity('operator-inbox-subscriptions')

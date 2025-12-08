@@ -81,10 +81,8 @@ TENANT {
 string id PK
 string name
 datetime created_at
-float priority_alpha
-float priority_beta
-int grace_period_minutes
-int max_concurrent_allocations_per_operator
+datetime updated_at
+datetime deleted_at
 }
 
 OPERATOR {
@@ -93,6 +91,8 @@ string tenant_id FK
 string name
 string role
 datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 INBOX {
@@ -103,6 +103,7 @@ string display_name
 boolean active
 datetime created_at
 datetime updated_at
+datetime deleted_at
 }
 
 OPERATOR_INBOX_SUBSCRIPTION {
@@ -111,6 +112,8 @@ string tenant_id FK
 string operator_id FK
 string inbox_id FK
 datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 CONVERSATION_REF {
@@ -126,6 +129,7 @@ int message_count
 float priority_score
 datetime created_at
 datetime updated_at
+datetime deleted_at
 datetime resolved_at
 }
 
@@ -137,6 +141,8 @@ string name
 string color
 string created_by_operator_id FK
 datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 CONVERSATION_LABEL {
@@ -144,12 +150,17 @@ string id PK
 string conversation_id FK
 string label_id FK
 datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 OPERATOR_STATUS {
 string operator_id PK, FK
 string status
 datetime last_status_change_at
+datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 GRACE_PERIOD_ASSIGNMENT {
@@ -160,14 +171,11 @@ string operator_id FK
 datetime expires_at
 string reason
 datetime created_at
+datetime updated_at
+datetime deleted_at
 }
 
 TENANT ||--o{ OPERATOR : "has many"
-TENANT ||--o{ INBOX : "has many"
-TENANT ||--o{ OPERATOR_INBOX_SUBSCRIPTION : "scopes"
-TENANT ||--o{ CONVERSATION_REF : "scopes"
-TENANT ||--o{ LABEL : "scopes"
-TENANT ||--o{ GRACE_PERIOD_ASSIGNMENT : "scopes"
 
 OPERATOR ||--|| OPERATOR_STATUS : "current status"
 OPERATOR ||--o{ OPERATOR_INBOX_SUBSCRIPTION : "subscribed to"

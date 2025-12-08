@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { OperatorsModule } from '../operator/operators.module';
-import { TokenModule } from '../token/token.module';
+import { OperatorsModule } from '../operators/operators.module';
+import { TokenModule } from '../tokens/token.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
