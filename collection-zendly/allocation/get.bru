@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{base_url}}/operators
+  url: {{base_url}}/allocation
   body: json
   auth: inherit
 }
 
 headers {
-  authorization: Bearer {{tokenAdminInbox1}}
+  authorization: Bearer {{tokenOperator}}
 }
 
 settings {

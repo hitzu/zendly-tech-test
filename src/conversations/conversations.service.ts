@@ -67,13 +67,10 @@ export class ConversationsService {
     });
   }
 
-  async upsert(
-    tenantId: number,
-    dto: CreateConversationDto,
-  ): Promise<ConversationRef> {
+  async upsert(dto: CreateConversationDto): Promise<ConversationRef> {
     const existing = await this.conversationRepository.findOne({
       where: {
-        tenantId,
+        tenantId: dto.tenantId,
         externalConversationId: dto.externalConversationId,
       },
     });
@@ -88,8 +85,8 @@ export class ConversationsService {
       return this.conversationRepository.save(existing);
     }
     const conversation = this.conversationRepository.create({
-      tenantId,
-      inboxId: Number(dto.inboxId),
+      tenantId: dto.tenantId,
+      inboxId: dto.inboxId,
       externalConversationId: dto.externalConversationId,
       customerPhoneNumber: dto.customerPhoneNumber,
       state: ConversationState.QUEUED,

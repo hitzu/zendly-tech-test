@@ -15,6 +15,7 @@ import { InboxesModule } from './inboxes/inboxes.module';
 import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions/operator-inbox-subscriptions.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { ConversationsModule } from './conversations/conversations.module';
+import { AllocationModule } from './allocation/allocation.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ConversationsModule } from './conversations/conversations.module';
     OperatorInboxSubscriptionsModule,
     TenantsModule,
     ConversationsModule,
+    AllocationModule,
   ],
   controllers: [AppController],
   providers: [

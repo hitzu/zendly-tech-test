@@ -1,0 +1,28 @@
+meta {
+  name: get
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/inboxes
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "phoneNumber": "+12025550124",
+    "displayName": "Sales Team"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

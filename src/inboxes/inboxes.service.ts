@@ -20,13 +20,17 @@ export class InboxesService {
     private readonly inboxRepository: Repository<Inbox>,
   ) {}
 
-  async listByTenant(tenantId: number): Promise<Inbox[]> {
+  async listByTenant(
+    tenantId: number,
+    relations: string[] = [],
+  ): Promise<Inbox[]> {
     try {
       return await this.inboxRepository.find({
         where: {
           tenantId,
           active: true,
         },
+        relations,
       });
     } catch (error) {
       this.logger.error(

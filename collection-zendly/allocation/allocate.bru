@@ -1,0 +1,72 @@
+meta {
+  name: allocate
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/allocation/allocate
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenOperator}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Pruebas que deberías hacer:
+  
+  Operador con suscripciones:
+  
+  Operador suscrito a 1–2 inboxes.
+  
+  Conversaciones QUEUED en esos inboxes.
+  
+  Llamar POST /allocation/allocate con ese token.
+  
+  ✅ Debe:
+  
+  Buscar solo en sus inboxes.
+  
+  Elegir 1 conversación.
+  
+  Pasar a ALLOCATED y dejar assignedOperatorId = operatorId.
+  
+  Operador sin suscripciones:
+  
+  Token de un OPERATOR sin ninguna suscripción.
+  
+  POST /allocation/allocate.
+  
+  ✅ Debe:
+  
+  No explotar.
+  
+  Regresar 204 o un error “no hay conversaciones disponibles”.
+  
+  Orden de prioridad:
+  
+  Tener varias conversaciones con distintos messageCount / lastMessageAt.
+  
+  Ver que realmente el código:
+  
+  Limita a 100.
+  
+  Ordena por priorityScore y luego lastMessageAt.
+  
+  Idempotencia ligera / chequeo de estado:
+  
+  Forzar el caso:
+  
+  Primero allocate a A1.
+  
+  Luego intentar allocate con A2 cuando ya no hay QUEUED.
+  
+  ✅ El segundo allocate no debe “robar” conversaciones ya asignadas.
+}

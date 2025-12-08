@@ -1,0 +1,42 @@
+meta {
+  name: claim
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/allocation/claim
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenOperatorInbox1}}
+}
+
+body:json {
+  {
+    "conversationId":1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Si la conversación está QUEUED:
+  
+  ✅ Pasa a ALLOCATED con assignedOperatorId = operatorId.
+  
+  Si la conversación ya está ALLOCATED:
+  
+  ✅ Responde con error controlado (409/400).
+  
+  Valida suscripción:
+  
+  Si operador no está suscrito al inboxId de la conversación:
+  
+  ✅ Debe rechazar el claim (403/400).
+}

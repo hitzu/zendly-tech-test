@@ -5,15 +5,13 @@ meta {
 }
 
 get {
-  url: {{base_url}}/tenants
+  url: {{base_url}}/conversations
   body: json
   auth: inherit
 }
 
-body:json {
-  {
-    "name":"Hitzu Labs"
-  }
+headers {
+  authorization: Bearer {{tokenOperator}}
 }
 
 settings {

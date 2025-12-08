@@ -5,15 +5,20 @@ meta {
 }
 
 post {
-  url: {{base_url}}/tenants
+  url: {{base_url}}/conversations
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "name":"Hitzu Labs"
-  }
+      "tenantId": 1,
+      "inboxId": 1,
+      "externalConversationId": "orch-0003",
+      "customerPhoneNumber": "+15555550003",
+      "lastMessageAt": "2024-12-08T12:00:00.000Z",
+      "messageCount": 0
+    }
 }
 
 settings {

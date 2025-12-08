@@ -1,0 +1,42 @@
+meta {
+  name: deallocate
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/allocation/deallocate
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+body:json {
+  {
+    "conversationId":1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Revisa:
+  
+  Solo sobre state === ALLOCATED.
+  
+  Permisos:
+  
+  Owner o MANAGER/ADMIN.
+  
+  Efecto:
+  
+  state = QUEUED.
+  
+  assignedOperatorId = null.
+}

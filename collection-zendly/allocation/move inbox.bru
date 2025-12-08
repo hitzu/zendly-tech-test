@@ -1,0 +1,47 @@
+meta {
+  name: move inbox
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/allocation/reassign
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+body:json {
+  {
+    "conversationId":1,
+    "newOperatorId": 4
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Solo MANAGER o ADMIN.
+  
+  Carga conversación:
+  
+  Debe estar ALLOCATED.
+  
+  Carga newOperator:
+  
+  Misma tenantId.
+  
+  (Ideal) suscrito al mismo inbox.
+  
+  Actualiza:
+  
+  assignedOperatorId = newOperatorId.
+  
+  No toca el state (sigue siendo ALLOCATED).
+}

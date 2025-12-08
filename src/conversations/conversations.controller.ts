@@ -27,6 +27,7 @@ import { ConversationResponseDto } from './dto/conversation-response.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { QueryConversationsDto } from './dto/query-conversations.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 type AuthedRequest = Request & { user?: DevTokenPayload };
 
@@ -100,28 +101,21 @@ export class ConversationsController {
   }
 
   @Post()
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or upsert a conversation (metadata only)' })
   @ApiResponse({ status: HttpStatus.CREATED, type: ConversationResponseDto })
   async create(
-    @Req() req: AuthedRequest,
     @Body() createConversationDto: CreateConversationDto,
   ): Promise<ConversationResponseDto> {
-    const user = req.user;
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    const tenantId = user.tenantId;
     this.logger.info(
       {
-        tenantId,
         inboxId: createConversationDto.inboxId,
         externalConversationId: createConversationDto.externalConversationId,
       },
       'Upserting conversation',
     );
     const conversation = await this.conversationsService.upsert(
-      tenantId,
       createConversationDto,
     );
     return new ConversationResponseDto(conversation);

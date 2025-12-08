@@ -14,6 +14,9 @@ enum ErrorMessages {
   GENERATE_TOKEN_ERROR = 'GENERATE_TOKEN_ERROR',
   JWT_SECRET_NOT_FOUND = 'JWT_SECRET_NOT_FOUND',
   INBOX_NOT_FOUND = 'INBOX_NOT_FOUND',
+  NO_AVAILABLE_CONVERSATIONS = 'NO_AVAILABLE_CONVERSATIONS',
+  CONVERSATION_NOT_FOUND = 'CONVERSATION_NOT_FOUND',
+  ONLY_ADMIN_OR_MANAGER_CAN_TRIGGER_THIS_ACTION = 'ONLY_ADMIN_OR_MANAGER_CAN_TRIGGER_THIS_ACTION',
   // Add more error messages as needed
 }
 
@@ -81,5 +84,17 @@ export const EXCEPTION_RESPONSE: Record<
   [ErrorMessages.INBOX_NOT_FOUND]: {
     code: 16,
     message: 'inbox not found',
+  },
+  [ErrorMessages.NO_AVAILABLE_CONVERSATIONS]: {
+    code: 17,
+    message: 'no available conversations',
+  },
+  [ErrorMessages.CONVERSATION_NOT_FOUND]: {
+    code: 18,
+    message: 'conversation not found',
+  },
+  [ErrorMessages.ONLY_ADMIN_OR_MANAGER_CAN_TRIGGER_THIS_ACTION]: {
+    code: 19,
+    message: 'only admin or manager can trigger this action',
   },
 };

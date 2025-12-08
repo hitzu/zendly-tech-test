@@ -11,6 +11,10 @@ import { Type } from 'class-transformer';
 export class CreateConversationDto {
   @ApiProperty()
   @IsNumberString()
+  tenantId!: number;
+
+  @ApiProperty()
+  @IsNumberString()
   inboxId!: number;
 
   @ApiProperty()

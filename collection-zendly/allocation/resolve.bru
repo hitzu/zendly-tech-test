@@ -1,0 +1,52 @@
+meta {
+  name: resolve
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/allocation/resolve
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenOperatorInbox1}}
+}
+
+body:json {
+  {
+    "conversationId":"2"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Verifica:
+  
+  Solo se puede resolver si:
+  
+  state === ALLOCATED.
+  
+  Y:
+  
+  el operador es el owner (assignedOperatorId === operatorId), o
+  
+  el role es MANAGER / ADMIN.
+  
+  Al resolver:
+  
+  state = RESOLVED.
+  
+  resolvedAt se setea.
+  
+  Si intentan resolver una conversación:
+  
+  QUEUED → error.
+  
+  RESOLVED otra vez → error.
+}
