@@ -5,13 +5,9 @@ meta {
 }
 
 post {
-  url: {{base_url}}/operators
+  url: {{base_url}}/auth/login
   body: json
   auth: inherit
-}
-
-body:json {
-  {"name":"Jane Operator","tenantId":"tenant-123","role":"OPERATOR"}
 }
 
 settings {

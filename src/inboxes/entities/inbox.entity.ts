@@ -1,5 +1,7 @@
+import { Column, Entity, OneToMany } from 'typeorm';
+
+import { OperatorInboxSubscription } from '../../operator-inbox-subscriptions/entities/operator-inbox-subscription.entity';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
-import { Column, Entity } from 'typeorm';
 
 @Entity('inboxes')
 export class Inbox extends BaseTimeEntity {
@@ -14,4 +16,10 @@ export class Inbox extends BaseTimeEntity {
 
   @Column('boolean', { name: 'active', default: true })
   active!: boolean;
+
+  @OneToMany(
+    () => OperatorInboxSubscription,
+    (subscription) => subscription.inbox,
+  )
+  operatorSubscriptions?: OperatorInboxSubscription[];
 }

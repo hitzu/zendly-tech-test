@@ -18,4 +18,3 @@ export class CreateInboxDto {
   @IsNotEmpty()
   displayName!: string;
 }
-

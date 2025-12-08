@@ -13,6 +13,7 @@ enum ErrorMessages {
   ACCESS_DENIED = 'ACCESS_DENIED',
   GENERATE_TOKEN_ERROR = 'GENERATE_TOKEN_ERROR',
   JWT_SECRET_NOT_FOUND = 'JWT_SECRET_NOT_FOUND',
+  INBOX_NOT_FOUND = 'INBOX_NOT_FOUND',
   // Add more error messages as needed
 }
 
@@ -76,5 +77,9 @@ export const EXCEPTION_RESPONSE: Record<
   [ErrorMessages.JWT_SECRET_NOT_FOUND]: {
     code: 15,
     message: 'JWT_SECRET is not found',
+  },
+  [ErrorMessages.INBOX_NOT_FOUND]: {
+    code: 16,
+    message: 'inbox not found',
   },
 };

@@ -8,10 +8,10 @@ export class Migration1765048475972 implements MigrationInterface {
       `CREATE TYPE "zendly"."OPERATOR_ROLES" AS ENUM('OPERATOR', 'MANAGER', 'ADMIN')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "operators" ("id" uuid NOT NULL, "tenant_id" text NOT NULL, "name" text NOT NULL, "role" "zendly"."OPERATOR_ROLES" NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3d02b3692836893720335a79d1b" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "operators" ("id" SERIAL NOT NULL, "tenant_id" integer NOT NULL, "name" text NOT NULL, "role" "zendly"."OPERATOR_ROLES" NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_3d02b3692836893720335a79d1b" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "token" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "token" text NOT NULL, "type" "zendly"."TOKEN_TYPE" NOT NULL, "operator_id" uuid, CONSTRAINT "PK_82fae97f905930df5d62a702fc9" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "token" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "token" text NOT NULL, "type" "zendly"."TOKEN_TYPE" NOT NULL, "operator_id" integer, CONSTRAINT "PK_82fae97f905930df5d62a702fc9" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "token" ADD CONSTRAINT "FK_eff0cf21ca2ebb82368e479cadd" FOREIGN KEY ("operator_id") REFERENCES "operators"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,

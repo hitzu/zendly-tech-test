@@ -1,14 +1,27 @@
+import { Column, Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
+
+import { Inbox } from '../../inboxes/entities/inbox.entity';
+import { Operator } from '../../operator/entities/operator.entity';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
-import { Column, Entity } from 'typeorm';
 
 @Entity('operator-inbox-subscriptions')
 export class OperatorInboxSubscription extends BaseTimeEntity {
   @Column('integer', { name: 'tenant_id' })
   tenantId!: number;
 
-  @Column('integer', { name: 'operator_id' })
+  @ManyToOne(() => Operator, { onDelete: 'CASCADE', nullable: false })
+  @JoinColumn({ name: 'operator_id' })
+  operator!: Operator;
+
+  @RelationId(
+    (subscription: OperatorInboxSubscription) => subscription.operator,
+  )
   operatorId!: number;
 
-  @Column('integer', { name: 'inbox_id' })
+  @ManyToOne(() => Inbox, { onDelete: 'CASCADE', nullable: false })
+  @JoinColumn({ name: 'inbox_id' })
+  inbox!: Inbox;
+
+  @RelationId((subscription: OperatorInboxSubscription) => subscription.inbox)
   inboxId!: number;
 }

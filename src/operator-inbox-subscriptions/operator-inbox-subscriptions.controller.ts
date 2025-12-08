@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  ForbiddenException,
   Param,
   Post,
   Query,
@@ -22,8 +21,6 @@ import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Request } from 'express';
 
 import { DevTokenPayload } from '../auth/guards/dev-token.guard';
-import { InboxesService } from '../inboxes/inboxes.service';
-import { OperatorsService } from '../operator/operators.service';
 import { CreateOperatorInboxSubscriptionDto } from './dto/create-operator-inbox-subscription.dto';
 import { ListOperatorInboxSubscriptionsQueryDto } from './dto/list-operator-inbox-subscriptions-query.dto';
 import { OperatorInboxSubscriptionResponseDto } from './dto/operator-inbox-subscription-response.dto';
@@ -36,8 +33,6 @@ type AuthedRequest = Request & { user?: DevTokenPayload };
 export class OperatorInboxSubscriptionsController {
   constructor(
     private readonly operatorInboxSubscriptionsService: OperatorInboxSubscriptionsService,
-    private readonly operatorsService: OperatorsService,
-    private readonly inboxesService: InboxesService,
     @InjectPinoLogger(OperatorInboxSubscriptionsController.name)
     private readonly logger: PinoLogger,
   ) {}
@@ -108,28 +103,6 @@ export class OperatorInboxSubscriptionsController {
     );
 
     try {
-      const operator = await this.operatorsService.findOperatorById(
-        createOperatorInboxSubscriptionDto.operatorId,
-      );
-      const inbox = await this.inboxesService.findById(
-        user.tenantId,
-        createOperatorInboxSubscriptionDto.inboxId,
-      );
-
-      if (!operator || operator.tenantId !== user.tenantId || !inbox) {
-        this.logger.error(
-          {
-            tenantId: user.tenantId,
-            operatorId: createOperatorInboxSubscriptionDto.operatorId,
-            inboxId: createOperatorInboxSubscriptionDto.inboxId,
-          },
-          'Operator and inbox must belong to the current tenant',
-        );
-        throw new ForbiddenException(
-          'Operator and inbox must belong to the current tenant',
-        );
-      }
-
       const subscription =
         await this.operatorInboxSubscriptionsService.createSubscription(
           user.tenantId,

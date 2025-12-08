@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { OPERATOR_ROLES } from '../../common/types/operator-roles.type';
 import { Token } from '../../token/entities/token.entity';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
+import { OperatorInboxSubscription } from '../../operator-inbox-subscriptions/entities/operator-inbox-subscription.entity';
 
 @Entity('operators')
 export class Operator extends BaseTimeEntity {
@@ -21,4 +22,10 @@ export class Operator extends BaseTimeEntity {
 
   @OneToMany(() => Token, (token) => token.operator)
   tokens?: Token[];
+
+  @OneToMany(
+    () => OperatorInboxSubscription,
+    (subscription) => subscription.operator,
+  )
+  inboxSubscriptions?: OperatorInboxSubscription[];
 }

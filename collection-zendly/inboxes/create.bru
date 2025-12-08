@@ -5,17 +5,21 @@ meta {
 }
 
 post {
-  url: {{base_url}}/operators
+  url: {{base_url}}/inboxes
   body: json
   auth: inherit
 }
 
+headers {
+  authorization: Bearer {{token}}
+}
+
 body:json {
   {
-    "name":"Jane ADMIN",
-    "tenantId":1,
-    "role":"ADMIN"
+    "phoneNumber": "+12025550124",
+    "displayName": "Sales Team"
   }
+  
 }
 
 settings {
