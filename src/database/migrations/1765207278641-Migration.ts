@@ -1,17 +1,24 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+const schema = process.env.DB_SCHEMA || 'public';
+
 export class Migration1765207278641 implements MigrationInterface {
   name = 'Migration1765207278641';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+    await queryRunner.query(`SET search_path TO "${schema}", public`);
     await queryRunner.query(
-      `CREATE TYPE "zendly"."OPERATOR_ROLES" AS ENUM('OPERATOR', 'MANAGER', 'ADMIN')`,
+      `CREATE TYPE "${schema}"."OPERATOR_ROLES" AS ENUM('OPERATOR', 'MANAGER', 'ADMIN')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "operators" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "tenant_id" integer NOT NULL, "name" text NOT NULL, "role" "zendly"."OPERATOR_ROLES" NOT NULL, CONSTRAINT "PK_3d02b3692836893720335a79d1b" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "${schema}"."TOKEN_TYPE" AS ENUM('access', 'refresh')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "token" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "token" text NOT NULL, "type" "zendly"."TOKEN_TYPE" NOT NULL, "operator_id" integer, CONSTRAINT "PK_82fae97f905930df5d62a702fc9" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "operators" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "tenant_id" integer NOT NULL, "name" text NOT NULL, "role" "${schema}"."OPERATOR_ROLES" NOT NULL, CONSTRAINT "PK_3d02b3692836893720335a79d1b" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "token" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "token" text NOT NULL, "type" "${schema}"."TOKEN_TYPE" NOT NULL, "operator_id" integer, CONSTRAINT "PK_82fae97f905930df5d62a702fc9" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "operator-inbox-subscriptions" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "tenant_id" integer NOT NULL, "operator_id" integer NOT NULL, "inbox_id" integer NOT NULL, CONSTRAINT "PK_d816c27ecc527d244ef61c0d247" PRIMARY KEY ("id"))`,
@@ -32,6 +39,7 @@ export class Migration1765207278641 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "operator-inbox-subscriptions"`);
     await queryRunner.query(`DROP TABLE "token"`);
     await queryRunner.query(`DROP TABLE "operators"`);
-    await queryRunner.query(`DROP TYPE "zendly"."OPERATOR_ROLES"`);
+    await queryRunner.query(`DROP TYPE "${schema}"."TOKEN_TYPE"`);
+    await queryRunner.query(`DROP TYPE "${schema}"."OPERATOR_ROLES"`);
   }
 }
