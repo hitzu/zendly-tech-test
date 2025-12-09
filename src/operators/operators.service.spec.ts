@@ -14,7 +14,6 @@ import { Tenant } from '../tenants/entities/tenant.entity';
 
 describe('OperatorsService', () => {
   let service: OperatorsService;
-  let repository: Repository<Operator>;
   let operatorFactory: OperatorFactory;
   let tenantFactory: TenantFactory;
   let tenantRepository: Repository<Tenant>;
@@ -31,7 +30,6 @@ describe('OperatorsService', () => {
     }).compile();
 
     service = module.get<OperatorsService>(OperatorsService);
-    repository = module.get<Repository<Operator>>(getRepositoryToken(Operator));
     operatorFactory = new OperatorFactory(TestDataSource);
     tenantFactory = new TenantFactory(TestDataSource);
     tenantRepository = TestDataSource.getRepository(Tenant);
@@ -55,8 +53,8 @@ describe('OperatorsService', () => {
   });
 
   it('updates an operator', async () => {
-    const tenant = await tenantRepository.save(await tenantFactory.make());
-    const existing = await operatorFactory.make({ tenantId: tenant.id });
+    const tenant = await tenantFactory.create();
+    const existing = await operatorFactory.create({ tenant });
 
     const update: UpdateOperatorDto = { name: 'Updated Name' };
     const updated = await service.updateOperator(existing.id, update);
@@ -65,7 +63,8 @@ describe('OperatorsService', () => {
   });
 
   it('finds all operators', async () => {
-    await repository.save(await operatorFactory.make());
+    const tenant = await tenantFactory.create();
+    await operatorFactory.create({ tenant });
     const operators = await service.findAllOperators();
     expect(Array.isArray(operators)).toBe(true);
   });

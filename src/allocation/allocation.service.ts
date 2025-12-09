@@ -42,10 +42,11 @@ export class AllocationService {
       await this.operatorInboxSubscriptionsService.listByTenant(tenantId, {
         operatorId,
       });
-    const inboxIds = subscriptions.map((subscription) => subscription.inboxId);
-    if (!inboxIds.length) {
+    if (!Array.isArray(subscriptions) || !subscriptions.length) {
       return null;
     }
+    const inboxIds =
+      subscriptions?.map((subscription) => subscription.inboxId) ?? [];
 
     const qb = this.conversationRepository.createQueryBuilder('conversation');
     qb.where('conversation.tenant_id = :tenantId', { tenantId })
@@ -106,10 +107,8 @@ export class AllocationService {
     conversationId: number,
   ): Promise<ConversationRef> {
     const { tenantId, operatorId } = context;
-    const conversation = await this.conversationsService.findById(
-      tenantId,
-      conversationId,
-    );
+    const conversation =
+      await this.conversationsService.findById(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -136,11 +135,11 @@ export class AllocationService {
     context: OperatorContext,
     conversationId: number,
   ): Promise<ConversationRef> {
-    const { tenantId, operatorId, role } = context;
-    const conversation = await this.conversationsService.findById(
-      tenantId,
-      conversationId,
-    );
+    const { operatorId, role } = context;
+
+    const conversation =
+      await this.conversationsService.findById(conversationId);
+
     if (!conversation) {
       throw new NotFoundException(EXCEPTION_RESPONSE.CONVERSATION_NOT_FOUND);
     }
@@ -167,11 +166,9 @@ export class AllocationService {
     context: OperatorContext,
     conversationId: number,
   ): Promise<ConversationRef> {
-    const { tenantId, operatorId, role } = context;
-    const conversation = await this.conversationsService.findById(
-      tenantId,
-      conversationId,
-    );
+    const { operatorId, role } = context;
+    const conversation =
+      await this.conversationsService.findById(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -205,10 +202,8 @@ export class AllocationService {
     if (!this.isManagerOrAdmin(role)) {
       throw new ForbiddenException('Only managers or admins can reassign');
     }
-    const conversation = await this.conversationsService.findById(
-      tenantId,
-      conversationId,
-    );
+    const conversation =
+      await this.conversationsService.findById(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -255,10 +250,8 @@ export class AllocationService {
         'Only managers or admins can move a conversation',
       );
     }
-    const conversation = await this.conversationsService.findById(
-      tenantId,
-      conversationId,
-    );
+    const conversation =
+      await this.conversationsService.findById(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }

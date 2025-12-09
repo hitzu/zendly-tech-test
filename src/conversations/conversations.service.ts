@@ -58,12 +58,9 @@ export class ConversationsService {
     return qb.getMany();
   }
 
-  async findById(
-    tenantId: number,
-    id: number,
-  ): Promise<ConversationRef | null> {
+  async findById(id: number): Promise<ConversationRef | null> {
     return this.conversationRepository.findOne({
-      where: { tenantId, id },
+      where: { id },
     });
   }
 
@@ -104,7 +101,7 @@ export class ConversationsService {
     id: number,
     dto: UpdateConversationDto,
   ): Promise<ConversationRef | undefined> {
-    const existing = await this.findById(tenantId, id);
+    const existing = await this.findById(id);
     if (!existing) {
       return undefined;
     }

@@ -103,13 +103,13 @@ describe('ConversationsService (unit)', () => {
 
   describe('findById', () => {
     it('returns conversation by tenant and id or null when missing', async () => {
-      const { tenant, inbox } = await createTenantAndInbox();
+      const { inbox } = await createTenantAndInbox();
       const conversation = await conversationFactory.createWithInbox(inbox);
 
-      const found = await service.findById(tenant.id, conversation.id);
+      const found = await service.findById(conversation.id);
       expect(found?.id).toBe(conversation.id);
 
-      const missing = await service.findById(tenant.id, 99999);
+      const missing = await service.findById(99999);
       expect(missing).toBeNull();
     });
   });

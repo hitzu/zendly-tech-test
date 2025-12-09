@@ -21,7 +21,7 @@ export class ConversationRefFactory extends Factory<ConversationRef> {
       tenantId: faker.number.int({ min: 1, max: 10_000 }),
       inboxId: faker.number.int({ min: 1, max: 10_000 }),
       externalConversationId: faker.string.uuid(),
-      customerPhoneNumber: faker.phone.number('+1##########'),
+      customerPhoneNumber: faker.phone.number({ style: 'international' }),
       state: ConversationState.QUEUED,
       assignedOperatorId: null,
       lastMessageAt: null,
@@ -42,4 +42,3 @@ export class ConversationRefFactory extends Factory<ConversationRef> {
     });
   }
 }
-
