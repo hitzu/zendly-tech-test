@@ -7,4 +7,3 @@ export class ClaimDto {
   @IsNotEmpty()
   conversationId!: string;
 }
-
