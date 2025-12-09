@@ -16,6 +16,7 @@ import { OperatorInboxSubscriptionsModule } from './operator-inbox-subscriptions
 import { TenantsModule } from './tenants/tenants.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AllocationModule } from './allocation/allocation.module';
+import { LabelsModule } from './labels/labels.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AllocationModule } from './allocation/allocation.module';
     TenantsModule,
     ConversationsModule,
     AllocationModule,
+    LabelsModule,
   ],
   controllers: [AppController],
   providers: [

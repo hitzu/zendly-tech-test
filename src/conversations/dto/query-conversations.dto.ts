@@ -5,7 +5,6 @@ import {
   IsIn,
   IsInt,
   IsOptional,
-  IsString,
   Max,
   Min,
   IsNumberString,
@@ -24,7 +23,7 @@ export class QueryConversationsDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
-  inboxId?: string;
+  inboxId?: number;
 
   @ApiPropertyOptional({ enum: ConversationState })
   @IsOptional()
@@ -34,14 +33,14 @@ export class QueryConversationsDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumberString()
-  assignedOperatorId?: string;
+  assignedOperatorId?: number;
 
   @ApiPropertyOptional({
-    description: 'Label filter placeholder, reserved for future integration',
+    description: 'Label filter placeholder',
   })
   @IsOptional()
-  @IsString()
-  labelId?: string;
+  @IsNumberString()
+  labelId?: number;
 
   @ApiPropertyOptional({
     enum: CONVERSATION_SORT_OPTIONS,

@@ -65,9 +65,9 @@ describe('ConversationsService (unit)', () => {
       });
 
       const results = await service.list(tenant.id, {
-        inboxId: String(inbox.id),
+        inboxId: inbox.id,
         state: ConversationState.RESOLVED,
-        assignedOperatorId: String(operator.id),
+        assignedOperatorId: operator.id,
       });
 
       expect(results).toHaveLength(1);

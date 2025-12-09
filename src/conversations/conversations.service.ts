@@ -10,6 +10,7 @@ import type {
   QueryConversationsDto,
   ConversationSort,
 } from './dto/query-conversations.dto';
+import { ConversationLabel } from '../labels/entities/conversation-label.entity';
 
 @Injectable()
 export class ConversationsService {
@@ -49,8 +50,14 @@ export class ConversationsService {
         assignedOperatorId: Number(assignedOperatorId),
       });
     }
-    if (labelId) {
-      // TODO: integrate label filtering once labels are modeled
+    const labelIdNum = labelId !== undefined ? Number(labelId) : undefined;
+    if (labelIdNum) {
+      qb.innerJoin(
+        ConversationLabel,
+        'conversationLabel',
+        'conversationLabel.conversationId = conversation.id AND conversationLabel.labelId = :labelId',
+        { labelId: labelIdNum },
+      );
     }
 
     this.applySorting(qb, sort);
@@ -126,16 +133,16 @@ export class ConversationsService {
     sort: ConversationSort,
   ): void {
     if (sort === 'oldest') {
-      qb.orderBy('conversation.created_at', 'ASC');
+      qb.orderBy('conversation.createdAt', 'ASC');
       return;
     }
     if (sort === 'priority') {
       qb.orderBy('conversation.priority_score', 'DESC').addOrderBy(
-        'conversation.last_message_at',
+        'conversation.lastMessageAt',
         'DESC',
       );
       return;
     }
-    qb.orderBy('conversation.created_at', 'DESC');
+    qb.orderBy('conversation.createdAt', 'DESC');
   }
 }

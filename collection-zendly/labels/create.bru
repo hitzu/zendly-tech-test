@@ -1,0 +1,28 @@
+meta {
+  name: create
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/labels
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+body:json {
+  {
+    "inboxId":1,
+    "name":"VIP",
+    "color":"#FF5733"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

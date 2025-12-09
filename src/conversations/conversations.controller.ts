@@ -89,7 +89,7 @@ export class ConversationsController {
     }
     const tenantId = user.tenantId;
     this.logger.info({ tenantId, conversationId: id }, 'Fetching conversation');
-    const conversation = await this.conversationsService.findById(tenantId, id);
+    const conversation = await this.conversationsService.findById(id);
     if (!conversation) {
       this.logger.error(
         { tenantId, conversationId: id },

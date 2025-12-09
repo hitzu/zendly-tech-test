@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{base_url}}/allocation/reassign
+  url: {{base_url}}/allocation/move-inbox
   body: json
   auth: inherit
 }
@@ -17,7 +17,7 @@ headers {
 body:json {
   {
     "conversationId":1,
-    "newOperatorId": 4
+    "newInboxId": 2
   }
 }
 

@@ -1,0 +1,24 @@
+meta {
+  name: get by inbox
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/labels?inboxId=1
+  body: json
+  auth: inherit
+}
+
+params:query {
+  inboxId: 1
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

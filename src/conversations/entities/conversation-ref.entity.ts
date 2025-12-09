@@ -1,10 +1,18 @@
-import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 
 import { Inbox } from '../../inboxes/entities/inbox.entity';
 import { Operator } from '../../operators/entities/operator.entity';
 import { Tenant } from '../../tenants/entities/tenant.entity';
 import { ConversationState } from '../conversation-state.enum';
 import { BaseTimeEntity } from '../../common/entities/base-time.entity';
+import { ConversationLabel } from '../../labels/entities/conversation-label.entity';
 
 @Entity('conversation_refs')
 @Unique('conversation_ref_tenant_external_unique', [
@@ -58,4 +66,10 @@ export class ConversationRef extends BaseTimeEntity {
   @ManyToOne(() => Operator, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'assigned_operator_id' })
   assignedOperator?: Operator | null;
+
+  @OneToMany(
+    () => ConversationLabel,
+    (conversationLabel) => conversationLabel.conversation,
+  )
+  conversationLabels?: ConversationLabel[];
 }

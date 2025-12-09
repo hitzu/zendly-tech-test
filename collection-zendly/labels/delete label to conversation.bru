@@ -1,0 +1,20 @@
+meta {
+  name: delete label to conversation
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/conversations/2/labels/1
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenOperatorInbox1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

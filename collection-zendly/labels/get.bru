@@ -1,0 +1,20 @@
+meta {
+  name: get
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/labels/1
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
