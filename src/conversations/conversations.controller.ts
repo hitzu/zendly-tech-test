@@ -12,6 +12,7 @@ import {
   Query,
   Req,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -19,7 +20,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { Request } from 'express';
 
 import { DevTokenPayload } from '../auth/guards/dev-token.guard';
@@ -35,11 +35,9 @@ type AuthedRequest = Request & { user?: DevTokenPayload };
 @ApiTags('Conversations')
 @Controller('conversations')
 export class ConversationsController {
-  constructor(
-    private readonly conversationsService: ConversationsService,
-    @InjectPinoLogger(ConversationsController.name)
-    private readonly logger: PinoLogger,
-  ) {}
+  private readonly logger = new Logger(ConversationsController.name);
+
+  constructor(private readonly conversationsService: ConversationsService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -56,7 +54,7 @@ export class ConversationsController {
       throw new UnauthorizedException();
     }
     const tenantId = user.tenantId;
-    this.logger.info(
+    this.logger.log(
       {
         tenantId,
         inboxId: query.inboxId,
@@ -90,7 +88,9 @@ export class ConversationsController {
       throw new UnauthorizedException();
     }
     const tenantId = user.tenantId;
-    this.logger.info({ tenantId, conversationId: id }, 'Fetching conversation');
+    this.logger.log(
+      `Fetching conversation for tenant ${tenantId} and id ${id}`,
+    );
     const conversation = await this.conversationsService.findById(id);
     if (!conversation) {
       this.logger.error(
@@ -110,7 +110,7 @@ export class ConversationsController {
   async create(
     @Body() createConversationDto: CreateConversationDto,
   ): Promise<ConversationResponseDto> {
-    this.logger.info(
+    this.logger.log(
       {
         inboxId: createConversationDto.inboxId,
         externalConversationId: createConversationDto.externalConversationId,
@@ -139,9 +139,8 @@ export class ConversationsController {
       throw new UnauthorizedException();
     }
     const tenantId = user.tenantId;
-    this.logger.info(
-      { tenantId, conversationId: id },
-      'Updating conversation metadata',
+    this.logger.log(
+      `Updating conversation metadata for tenant ${tenantId} and id ${id}`,
     );
     const conversation = await this.conversationsService.updateMetadata(
       tenantId,

@@ -10,6 +10,7 @@ import { OperatorStatus } from './entities/operator-status.entity';
 import { OperatorStatusController } from './operator-status.controller';
 import { OperatorStatusService } from './operator-status.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { Operator } from '../operators/entities/operator.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       OperatorStatus,
       GracePeriodAssignment,
       ConversationRef,
+      Operator,
     ]),
     ScheduleModule.forRoot(),
     OperatorsModule,

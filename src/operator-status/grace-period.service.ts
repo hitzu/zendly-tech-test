@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { LessThanOrEqual, Repository } from 'typeorm';
 
 import { ConversationState } from '../conversations/conversation-state.enum';
@@ -9,13 +8,13 @@ import { GracePeriodAssignment } from './entities/grace-period-assignment.entity
 
 @Injectable()
 export class GracePeriodService {
+  private readonly logger = new Logger(GracePeriodService.name);
+
   constructor(
     @InjectRepository(GracePeriodAssignment)
     private readonly gracePeriodRepository: Repository<GracePeriodAssignment>,
     @InjectRepository(ConversationRef)
     private readonly conversationRepository: Repository<ConversationRef>,
-    @InjectPinoLogger(GracePeriodService.name)
-    private readonly logger: PinoLogger,
   ) {}
 
   async processExpiredGracePeriods(
@@ -50,10 +49,7 @@ export class GracePeriodService {
       processed += 1;
     }
 
-    this.logger.info(
-      { processed },
-      'Processed expired grace period assignments',
-    );
+    this.logger.log(`Processed ${processed} expired grace period assignments`);
 
     return { processed };
   }
