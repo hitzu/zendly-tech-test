@@ -18,6 +18,7 @@ import { OperatorsService } from '../operators/operators.service';
 import { EXCEPTION_RESPONSE } from '../config/errors/exception-response.config';
 import { OperatorAvailability } from '../operator-status/entities/operator-status.entity';
 import { OperatorStatusService } from '../operator-status/operator-status.service';
+import { PriorityConfigService } from './priority-config.service';
 
 interface OperatorContext {
   tenantId: number;
@@ -35,6 +36,7 @@ export class AllocationService {
     private readonly inboxesService: InboxesService,
     private readonly operatorsService: OperatorsService,
     private readonly operatorStatusService: OperatorStatusService,
+    private readonly priorityConfigService: PriorityConfigService,
   ) {}
 
   async allocateNextForOperator(
@@ -65,29 +67,9 @@ export class AllocationService {
       return null;
     }
 
-    const sorted = candidates
-      .map((conversation) => ({
-        conversation,
-        priority:
-          conversation.priorityScore ||
-          conversation.messageCount ||
-          0 /* TODO: replace with tenant-configurable scoring */,
-      }))
-      .sort((a, b) => {
-        const byPriority = b.priority - a.priority;
-        if (byPriority !== 0) {
-          return byPriority;
-        }
-        const aTime =
-          a.conversation.lastMessageAt?.getTime() ??
-          a.conversation.createdAt.getTime();
-        const bTime =
-          b.conversation.lastMessageAt?.getTime() ??
-          b.conversation.createdAt.getTime();
-        return bTime - aTime;
-      });
-
-    const candidate = sorted[0]?.conversation;
+    const sorted = await this.scoreAndSortCandidates(tenantId, candidates);
+    const candidateEntry = sorted[0];
+    const candidate = candidateEntry?.conversation;
     if (!candidate) {
       return null;
     }
@@ -102,6 +84,8 @@ export class AllocationService {
     // TODO: apply DB-level row locking (SELECT ... FOR UPDATE) to avoid races.
     fresh.state = ConversationState.ALLOCATED;
     fresh.assignedOperatorId = operatorId;
+    fresh.priorityScore =
+      candidateEntry?.priority ?? fresh.priorityScore ?? 0;
     fresh.updatedAt = new Date();
     return this.conversationRepository.save(fresh);
   }
@@ -288,6 +272,53 @@ export class AllocationService {
     conversation.assignedOperatorId = null;
     conversation.updatedAt = new Date();
     return this.conversationRepository.save(conversation);
+  }
+
+  private async scoreAndSortCandidates(
+    tenantId: number,
+    conversations: ConversationRef[],
+  ): Promise<
+    { conversation: ConversationRef; priority: number; lastTimestamp: Date }[]
+  > {
+    if (!conversations.length) {
+      return [];
+    }
+
+    const { alpha, beta } = await this.priorityConfigService.getWeights(tenantId);
+    const now = Date.now();
+
+    const withFeatures = conversations.map((conversation) => {
+      const lastTimestamp = conversation.lastMessageAt ?? conversation.createdAt;
+      const delayMs = Math.max(0, now - lastTimestamp.getTime());
+      const msgCount = conversation.messageCount ?? 0;
+      return { conversation, msgCount, delayMs, lastTimestamp };
+    });
+
+    const msgCounts = withFeatures.map((entry) => entry.msgCount);
+    const delays = withFeatures.map((entry) => entry.delayMs);
+    const msgMin = Math.min(...msgCounts);
+    const msgMax = Math.max(...msgCounts);
+    const delayMin = Math.min(...delays);
+    const delayMax = Math.max(...delays);
+    const msgRange = msgMax - msgMin;
+    const delayRange = delayMax - delayMin;
+
+    return withFeatures
+      .map((entry) => {
+        const normMsg =
+          msgRange === 0 ? 0 : (entry.msgCount - msgMin) / msgRange;
+        const normDelay =
+          delayRange === 0 ? 0 : (entry.delayMs - delayMin) / delayRange;
+        const priority = alpha * normMsg + beta * normDelay;
+        return { ...entry, priority };
+      })
+      .sort((a, b) => {
+        const byPriority = b.priority - a.priority;
+        if (byPriority !== 0) {
+          return byPriority;
+        }
+        return b.lastTimestamp.getTime() - a.lastTimestamp.getTime();
+      });
   }
 
   private isManagerOrAdmin(role: DevTokenRole): boolean {

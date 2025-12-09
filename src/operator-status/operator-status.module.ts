@@ -11,6 +11,7 @@ import { OperatorStatusController } from './operator-status.controller';
 import { OperatorStatusService } from './operator-status.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { Operator } from '../operators/entities/operator.entity';
+import { GracePeriodScheduler } from './grace-period.scheduler';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { Operator } from '../operators/entities/operator.entity';
     OperatorsModule,
   ],
   controllers: [OperatorStatusController, GracePeriodController],
-  providers: [OperatorStatusService, GracePeriodService],
+  providers: [OperatorStatusService, GracePeriodService, GracePeriodScheduler],
   exports: [OperatorStatusService, GracePeriodService],
 })
 export class OperatorStatusModule {}

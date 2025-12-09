@@ -49,7 +49,7 @@ export class ConversationRef extends BaseTimeEntity {
   @Column('integer', { name: 'message_count', default: 0 })
   messageCount!: number;
 
-  @Column('integer', { name: 'priority_score', default: 0 })
+  @Column('double precision', { name: 'priority_score', default: 0 })
   priorityScore!: number;
 
   @Column('timestamptz', { name: 'resolved_at', nullable: true })

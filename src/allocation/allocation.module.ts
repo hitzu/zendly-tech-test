@@ -9,6 +9,7 @@ import { OperatorInboxSubscriptionsModule } from '../operator-inbox-subscription
 import { InboxesModule } from '../inboxes/inboxes.module';
 import { OperatorsModule } from '../operators/operators.module';
 import { OperatorStatusModule } from '../operator-status/operator-status.module';
+import { PriorityConfigService } from './priority-config.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { OperatorStatusModule } from '../operator-status/operator-status.module'
     OperatorStatusModule,
   ],
   controllers: [AllocationController],
-  providers: [AllocationService],
+  providers: [AllocationService, PriorityConfigService],
   exports: [AllocationService],
 })
 export class AllocationModule {}

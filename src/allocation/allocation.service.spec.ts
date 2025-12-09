@@ -16,6 +16,8 @@ import { InboxFactory } from '../../test/factories/inbox/inbox.factory';
 import { OperatorFactory } from '../../test/factories/operator/operator.factory';
 import { TenantFactory } from '../../test/factories/tenant/tenant.factory';
 import type { DevTokenRole } from '../auth/guards/dev-token.guard';
+import { OperatorAvailability } from '../operator-status/entities/operator-status.entity';
+import { PriorityConfigService } from './priority-config.service';
 
 describe('AllocationService', () => {
   let service: AllocationService;
@@ -23,6 +25,8 @@ describe('AllocationService', () => {
   let operatorInboxSubscriptionsService: OperatorInboxSubscriptionsService;
   let inboxesService: InboxesService;
   let operatorsService: OperatorsService;
+  let operatorStatusService: { getStatus: jest.Mock };
+  let priorityConfigService: { getWeights: jest.Mock };
   let repo: Repository<ConversationRef>;
   let operatorInboxSubscriptionRepository: Repository<OperatorInboxSubscription>;
 
@@ -61,6 +65,14 @@ describe('AllocationService', () => {
     operatorInboxSubscriptionsService = new OperatorInboxSubscriptionsService(
       operatorInboxSubscriptionRepository,
     );
+    operatorStatusService = {
+      getStatus: jest
+        .fn()
+        .mockResolvedValue({ status: OperatorAvailability.AVAILABLE }),
+    };
+    priorityConfigService = {
+      getWeights: jest.fn().mockResolvedValue({ alpha: 0.5, beta: 0.5 }),
+    };
 
     service = new AllocationService(
       repo,
@@ -68,6 +80,8 @@ describe('AllocationService', () => {
       operatorInboxSubscriptionsService,
       inboxesService,
       operatorsService,
+      operatorStatusService as unknown as any,
+      priorityConfigService as unknown as PriorityConfigService,
     );
 
     tenantFactory = new TenantFactory(AppDataSource);
@@ -110,7 +124,9 @@ describe('AllocationService', () => {
       expect(result).toBeNull();
     });
 
-    it('allocates highest priority and newest when tie', async () => {
+    it('allocates highest weighted priority (message count + delay)', async () => {
+      const now = new Date('2024-01-04T00:00:00Z');
+      const dateSpy = jest.spyOn(Date, 'now').mockReturnValue(now.getTime());
       const tenant = await tenantFactory.create();
       const inbox = await inboxFactory.createWithTenant(tenant);
       const operator = await operatorFactory.create({ tenantId: tenant.id });
@@ -122,35 +138,39 @@ describe('AllocationService', () => {
         }),
       );
 
+      // Lowest score: fewer messages and oldest delay dominates.
       await conversationFactory.create({
         tenantId: tenant.id,
         inboxId: inbox.id,
         state: ConversationState.QUEUED,
-        priorityScore: 5,
-        lastMessageAt: new Date('2023-01-01T00:00:00Z'),
+        messageCount: 1,
+        lastMessageAt: new Date('2024-01-03T00:00:00Z'),
       });
+      // Medium score: more messages but short delay.
       await conversationFactory.create({
         tenantId: tenant.id,
         inboxId: inbox.id,
         state: ConversationState.QUEUED,
-        priorityScore: 7,
-        lastMessageAt: new Date('2023-01-02T00:00:00Z'),
+        messageCount: 5,
+        lastMessageAt: new Date('2024-01-03T22:00:00Z'),
       });
-      const tieNew = await conversationFactory.create({
+      // Highest combined score: most messages and still recent enough.
+      const expected = await conversationFactory.create({
         tenantId: tenant.id,
         inboxId: inbox.id,
         state: ConversationState.QUEUED,
-        priorityScore: 7,
-        lastMessageAt: new Date('2023-01-03T00:00:00Z'),
+        messageCount: 10,
+        lastMessageAt: new Date('2024-01-03T19:00:00Z'),
       });
 
       const allocated = await service.allocateNextForOperator(
         context({ tenantId: tenant.id, operatorId: operator.id }),
       );
 
-      expect(allocated?.id).toBe(tieNew.id);
+      expect(allocated?.id).toBe(expected.id);
       expect(allocated?.state).toBe(ConversationState.ALLOCATED);
       expect(allocated?.assignedOperatorId).toBe(operator.id);
+      dateSpy.mockRestore();
     });
 
     it('returns null when refreshed candidate is not queued', async () => {
