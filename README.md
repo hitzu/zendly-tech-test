@@ -45,6 +45,12 @@ The service exposes a clean API for agent UIs, supervisor consoles and automatio
 
 ---
 
+## Production URL
+
+Live deployment: https://zendly-tech-test.onrender.com
+
+---
+
 ## Running the project locally
 
 ### Prerequisites
@@ -85,7 +91,7 @@ pnpm run start:dev
 
 Once the app is running, open:
 
-Swagger UI: http://localhost:<PORT>/docs
+Swagger UI: https://zendly-tech-test.onrender.com/api
 
 (Replace <PORT> with the configured HTTP port, typically 3000.)
 
@@ -94,6 +100,15 @@ Swagger UI: http://localhost:<PORT>/docs
 ## Functional overview
 
 At a high level, the service implements the domain described in the “Backend requirements for Inbox and Allocation system” document and exposes the capabilities below.
+
+## Documentation
+
+The following documents provide more detailed information about this service:
+
+- [Architecture](./ARCHITECTURE.md) – Domain model, ERD, and main flows.
+- [Design Decisions](./DESIGN_DECISIONS.md) – How the original spec was interpreted and implemented.
+- [API Reference](./API.md) – Detailed list of endpoints, parameters, and responses.
+- [Testing](./TESTING.md) – Manual and automated testing strategy and flow coverage.
 
 ### Multi-tenant model
 

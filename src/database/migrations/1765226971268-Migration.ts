@@ -1,14 +1,17 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+const schema = process.env.DB_SCHEMA || 'public';
+
 export class Migration1765226971268 implements MigrationInterface {
   name = 'Migration1765226971268';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`SET search_path TO "${schema}", public`);
     await queryRunner.query(
-      `CREATE TYPE "zendly"."CONVERSATION_STATE" AS ENUM('QUEUED', 'ALLOCATED', 'RESOLVED')`,
+      `CREATE TYPE "${schema}"."CONVERSATION_STATE" AS ENUM('QUEUED', 'ALLOCATED', 'RESOLVED')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "conversation_refs" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "tenant_id" integer NOT NULL, "inbox_id" integer NOT NULL, "external_conversation_id" text NOT NULL, "customer_phone_number" text NOT NULL, "state" "zendly"."CONVERSATION_STATE" NOT NULL DEFAULT 'QUEUED', "assigned_operator_id" integer, "last_message_at" TIMESTAMP WITH TIME ZONE, "message_count" integer NOT NULL DEFAULT '0', "priority_score" double precision NOT NULL DEFAULT '0', "resolved_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "conversation_ref_tenant_external_unique" UNIQUE ("tenant_id", "external_conversation_id"), CONSTRAINT "PK_266c86d40b8de8bc2898dd6aadc" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "conversation_refs" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "tenant_id" integer NOT NULL, "inbox_id" integer NOT NULL, "external_conversation_id" text NOT NULL, "customer_phone_number" text NOT NULL, "state" "${schema}"."CONVERSATION_STATE" NOT NULL DEFAULT 'QUEUED', "assigned_operator_id" integer, "last_message_at" TIMESTAMP WITH TIME ZONE, "message_count" integer NOT NULL DEFAULT '0', "priority_score" double precision NOT NULL DEFAULT '0', "resolved_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "conversation_ref_tenant_external_unique" UNIQUE ("tenant_id", "external_conversation_id"), CONSTRAINT "PK_266c86d40b8de8bc2898dd6aadc" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "inboxes" ADD CONSTRAINT "inbox_tenant_phone_unique" UNIQUE ("tenant_id", "phone_number")`,
@@ -38,6 +41,6 @@ export class Migration1765226971268 implements MigrationInterface {
       `ALTER TABLE "inboxes" DROP CONSTRAINT "inbox_tenant_phone_unique"`,
     );
     await queryRunner.query(`DROP TABLE "conversation_refs"`);
-    await queryRunner.query(`DROP TYPE "zendly"."CONVERSATION_STATE"`);
+    await queryRunner.query(`DROP TYPE "${schema}"."CONVERSATION_STATE"`);
   }
 }
