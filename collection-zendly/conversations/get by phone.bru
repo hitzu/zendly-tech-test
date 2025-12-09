@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{base_url}}/conversations/search/by-phone?phoneNumber=+15555550002
+  url: {{base_url}}/conversations?customerPhoneNumber=+15555550002
   body: json
   auth: inherit
 }
 
 params:query {
-  phoneNumber: +15555550002
+  customerPhoneNumber: +15555550002
 }
 
 headers {

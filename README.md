@@ -185,11 +185,17 @@ subgraph Operator Side
 
   G --> H[Operator presses Get next conversation]
 
+  G --> H2[Operator selects a specific queued conversation]
+
   H --> I[POST /allocation/allocate with operator_id]
+
+  H2 --> I2[POST /allocation/claim with conversation_id]
 
 end
 
 I --> J[Backend validates operator role and status AVAILABLE]
+
+I2 --> J
 
 J --> K[Backend builds candidate list:<br/>QUEUED + subscribed inboxes + last 100]
 
