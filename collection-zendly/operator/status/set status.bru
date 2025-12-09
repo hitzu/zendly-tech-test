@@ -1,0 +1,24 @@
+meta {
+  name: set status
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/operator-status/me
+  body: json
+  auth: inherit
+}
+
+headers {
+  authorization: Bearer {{tokenOperatorInbox1}}
+}
+
+body:json {
+  {"status":"AVAILABLE"}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

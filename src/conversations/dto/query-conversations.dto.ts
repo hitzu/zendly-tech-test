@@ -5,9 +5,9 @@ import {
   IsIn,
   IsInt,
   IsOptional,
+  IsString,
   Max,
   Min,
-  IsNumberString,
 } from 'class-validator';
 import { ConversationState } from '../conversation-state.enum';
 
@@ -22,7 +22,9 @@ export type ConversationSort = (typeof CONVERSATION_SORT_OPTIONS)[number];
 export class QueryConversationsDto {
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   inboxId?: number;
 
   @ApiPropertyOptional({ enum: ConversationState })
@@ -32,15 +34,17 @@ export class QueryConversationsDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   assignedOperatorId?: number;
 
   @ApiPropertyOptional({
-    description: 'Label filter placeholder',
+    description: 'Exact match filter by customer phone number',
   })
   @IsOptional()
-  @IsNumberString()
-  labelId?: number;
+  @IsString()
+  customerPhoneNumber?: string;
 
   @ApiPropertyOptional({
     enum: CONVERSATION_SORT_OPTIONS,

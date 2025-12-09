@@ -16,6 +16,8 @@ import { OperatorInboxSubscriptionsService } from '../operator-inbox-subscriptio
 import { InboxesService } from '../inboxes/inboxes.service';
 import { OperatorsService } from '../operators/operators.service';
 import { EXCEPTION_RESPONSE } from '../config/errors/exception-response.config';
+import { OperatorAvailability } from '../operator-status/entities/operator-status.entity';
+import { OperatorStatusService } from '../operator-status/operator-status.service';
 
 interface OperatorContext {
   tenantId: number;
@@ -32,12 +34,14 @@ export class AllocationService {
     private readonly operatorInboxSubscriptionsService: OperatorInboxSubscriptionsService,
     private readonly inboxesService: InboxesService,
     private readonly operatorsService: OperatorsService,
+    private readonly operatorStatusService: OperatorStatusService,
   ) {}
 
   async allocateNextForOperator(
     context: OperatorContext,
   ): Promise<ConversationRef | null> {
     const { tenantId, operatorId } = context;
+    await this.ensureOperatorAvailable(tenantId, operatorId);
     const subscriptions =
       await this.operatorInboxSubscriptionsService.listByTenant(tenantId, {
         operatorId,
@@ -107,6 +111,7 @@ export class AllocationService {
     conversationId: number,
   ): Promise<ConversationRef> {
     const { tenantId, operatorId } = context;
+    await this.ensureOperatorAvailable(tenantId, operatorId);
     const conversation =
       await this.conversationsService.findById(conversationId);
     if (!conversation) {
@@ -160,6 +165,19 @@ export class AllocationService {
     conversation.updatedAt = new Date();
     // await this.emitResolvedEventStub(conversation);
     return this.conversationRepository.save(conversation);
+  }
+
+  private async ensureOperatorAvailable(
+    tenantId: number,
+    operatorId: number,
+  ): Promise<void> {
+    const status = await this.operatorStatusService.getStatus(
+      tenantId,
+      operatorId,
+    );
+    if (status && status.status === OperatorAvailability.OFFLINE) {
+      throw new ConflictException('Operator is offline');
+    }
   }
 
   async deallocateConversation(

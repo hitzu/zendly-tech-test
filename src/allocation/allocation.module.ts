@@ -8,6 +8,7 @@ import { ConversationsModule } from '../conversations/conversations.module';
 import { OperatorInboxSubscriptionsModule } from '../operator-inbox-subscriptions/operator-inbox-subscriptions.module';
 import { InboxesModule } from '../inboxes/inboxes.module';
 import { OperatorsModule } from '../operators/operators.module';
+import { OperatorStatusModule } from '../operator-status/operator-status.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { OperatorsModule } from '../operators/operators.module';
     OperatorInboxSubscriptionsModule,
     InboxesModule,
     OperatorsModule,
+    OperatorStatusModule,
   ],
   controllers: [AllocationController],
   providers: [AllocationService],

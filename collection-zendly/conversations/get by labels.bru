@@ -5,13 +5,17 @@ meta {
 }
 
 get {
-  url: {{base_url}}/conversations
+  url: {{base_url}}/conversations?labelId=1
   body: json
   auth: inherit
 }
 
+params:query {
+  labelId: 1
+}
+
 headers {
-  authorization: Bearer {{tokenOperator}}
+  authorization: Bearer {{tokenAdminInbox1}}
 }
 
 settings {

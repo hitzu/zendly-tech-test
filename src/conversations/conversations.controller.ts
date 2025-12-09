@@ -6,6 +6,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -61,6 +62,7 @@ export class ConversationsController {
         inboxId: query.inboxId,
         state: query.state,
         assignedOperatorId: query.assignedOperatorId,
+        customerPhoneNumber: query.customerPhoneNumber,
         sort: query.sort ?? 'newest',
       },
       'Listing conversations for tenant',
@@ -80,7 +82,7 @@ export class ConversationsController {
     description: 'Conversation not found',
   })
   async findOne(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Req() req: AuthedRequest,
   ): Promise<ConversationResponseDto> {
     const user = req.user;

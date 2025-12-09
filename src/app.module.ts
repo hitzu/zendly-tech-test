@@ -17,6 +17,7 @@ import { TenantsModule } from './tenants/tenants.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { AllocationModule } from './allocation/allocation.module';
 import { LabelsModule } from './labels/labels.module';
+import { OperatorStatusModule } from './operator-status/operator-status.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { LabelsModule } from './labels/labels.module';
     ConversationsModule,
     AllocationModule,
     LabelsModule,
+    OperatorStatusModule,
   ],
   controllers: [AppController],
   providers: [

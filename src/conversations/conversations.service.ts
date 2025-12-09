@@ -10,7 +10,6 @@ import type {
   QueryConversationsDto,
   ConversationSort,
 } from './dto/query-conversations.dto';
-import { ConversationLabel } from '../labels/entities/conversation-label.entity';
 
 @Injectable()
 export class ConversationsService {
@@ -27,37 +26,33 @@ export class ConversationsService {
       inboxId,
       state,
       assignedOperatorId,
-      labelId,
+      customerPhoneNumber,
       sort = 'newest',
       limit = 20,
       offset,
       page,
     } = query;
-    const safeLimit = Math.min(limit, 100);
+    const safeLimit = Math.min(limit ?? 20, 100);
     const start = page ? (page - 1) * safeLimit : (offset ?? 0);
     const qb = this.conversationRepository.createQueryBuilder('conversation');
     qb.where('conversation.tenant_id = :tenantId', { tenantId });
     if (inboxId) {
       qb.andWhere('conversation.inbox_id = :inboxId', {
-        inboxId: Number(inboxId),
+        inboxId,
       });
     }
     if (state) {
       qb.andWhere('conversation.state = :state', { state });
     }
-    if (assignedOperatorId) {
+    if (assignedOperatorId !== undefined) {
       qb.andWhere('conversation.assigned_operator_id = :assignedOperatorId', {
-        assignedOperatorId: Number(assignedOperatorId),
+        assignedOperatorId,
       });
     }
-    const labelIdNum = labelId !== undefined ? Number(labelId) : undefined;
-    if (labelIdNum) {
-      qb.innerJoin(
-        ConversationLabel,
-        'conversationLabel',
-        'conversationLabel.conversationId = conversation.id AND conversationLabel.labelId = :labelId',
-        { labelId: labelIdNum },
-      );
+    if (customerPhoneNumber) {
+      qb.andWhere('conversation.customer_phone_number = :customerPhoneNumber', {
+        customerPhoneNumber,
+      });
     }
 
     this.applySorting(qb, sort);
@@ -133,16 +128,33 @@ export class ConversationsService {
     sort: ConversationSort,
   ): void {
     if (sort === 'oldest') {
-      qb.orderBy('conversation.createdAt', 'ASC');
+      qb.orderBy('conversation.created_at', 'ASC');
       return;
     }
     if (sort === 'priority') {
       qb.orderBy('conversation.priority_score', 'DESC').addOrderBy(
-        'conversation.lastMessageAt',
+        'conversation.last_message_at',
         'DESC',
       );
       return;
     }
-    qb.orderBy('conversation.createdAt', 'DESC');
+    qb.orderBy('conversation.created_at', 'DESC');
+  }
+
+  async findByPhoneNumber(
+    tenantId: number,
+    phoneNumber: string,
+    limit = 50,
+  ): Promise<ConversationRef[]> {
+    const safeLimit = Math.min(limit ?? 50, 50);
+    const qb = this.conversationRepository.createQueryBuilder('conversation');
+    qb.where('conversation.tenant_id = :tenantId', { tenantId })
+      .andWhere('conversation.customer_phone_number = :phoneNumber', {
+        phoneNumber,
+      })
+      .orderBy('conversation.last_message_at', 'DESC')
+      .addOrderBy('conversation.created_at', 'DESC')
+      .take(safeLimit);
+    return qb.getMany();
   }
 }

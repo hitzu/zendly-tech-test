@@ -1,13 +1,17 @@
 meta {
-  name: get
+  name: get by phone
   type: http
-  seq: 1
+  seq: 4
 }
 
 get {
-  url: {{base_url}}/operators
+  url: {{base_url}}/conversations/search/by-phone?phoneNumber=+15555550002
   body: json
   auth: inherit
+}
+
+params:query {
+  phoneNumber: +15555550002
 }
 
 headers {
