@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsIn,
   IsInt,
-  IsNumber,
   IsOptional,
   IsString,
   Max,
@@ -51,7 +50,9 @@ export class QueryConversationsDto {
     description: 'Exact match filter by label id',
   })
   @IsOptional()
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   labelId?: number;
 
   @ApiPropertyOptional({

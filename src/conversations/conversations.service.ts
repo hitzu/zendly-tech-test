@@ -60,7 +60,7 @@ export class ConversationsService {
     }
     if (labelId) {
       qb.innerJoin(
-        'conversation.conversationLabels', // relación definida en ConversationRef
+        'conversation.conversationLabels',
         'conversationLabel',
         'conversationLabel.labelId = :labelId', // propiedad, no columna
         { labelId },
@@ -78,7 +78,7 @@ export class ConversationsService {
     });
   }
 
-  async findByTenantAndId(
+  private async findByTenantAndId(
     tenantId: number,
     id: number,
   ): Promise<ConversationRef | null> {

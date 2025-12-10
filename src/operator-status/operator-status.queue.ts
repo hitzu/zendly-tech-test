@@ -1,9 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import {
-  OperatorAvailability,
-  OperatorStatus,
-} from './entities/operator-status.entity';
+import { OperatorAvailability } from './entities/operator-status.entity';
+import type { OperatorStatus } from './entities/operator-status.entity.ts';
 import { OperatorStatusService } from './operator-status.service';
 
 type OperatorStatusJob = {
@@ -16,20 +14,15 @@ type OperatorStatusJob = {
 const MAX_ATTEMPTS = 3;
 const BASE_BACKOFF_MS = 500;
 
-/**
- * Very small in-memory queue to set operator status asynchronously without external brokers.
- * This is best-effort and non-durable: jobs are lost on process restart.
- */
 @Injectable()
 export class OperatorStatusQueue implements OnModuleInit {
   private readonly logger = new Logger(OperatorStatusQueue.name);
   private readonly queue: OperatorStatusJob[] = [];
-  private running = false;
+  private isRunning: boolean = false;
 
   constructor(private readonly operatorStatusService: OperatorStatusService) {}
 
   onModuleInit(): void {
-    // Kick the loop in case something enqueues during bootstrap.
     this.runLoop();
   }
 
@@ -43,14 +36,13 @@ export class OperatorStatusQueue implements OnModuleInit {
   }
 
   private runLoop(): void {
-    if (this.running) {
+    if (this.isRunning) {
       return;
     }
-    this.running = true;
+    this.isRunning = true;
     void this.processQueue().finally(() => {
-      this.running = false;
+      this.isRunning = false;
       if (this.queue.length) {
-        // New jobs arrived while processing; continue.
         this.runLoop();
       }
     });
