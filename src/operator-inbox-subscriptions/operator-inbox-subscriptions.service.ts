@@ -48,6 +48,14 @@ export class OperatorInboxSubscriptionsService {
     }
   }
 
+  async findByOperatorId(
+    operatorId: number,
+  ): Promise<OperatorInboxSubscription[]> {
+    return this.operatorInboxSubscriptionRepository.find({
+      where: { operatorId },
+    });
+  }
+
   async createSubscription(
     tenantId: number,
     createOperatorInboxSubscriptionDto: CreateOperatorInboxSubscriptionDto,

@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { ConversationState } from './conversation-state.enum';
 import { ConversationRef } from './entities/conversation-ref.entity';
 import { CreateConversationDto } from './dto/create-conversation.dto';
+import { ConversationContactResponseDto } from './dto/conversation-contact-response.dto';
+import { ConversationHistoryResponseDto } from './dto/conversation-history-response.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import type {
   QueryConversationsDto,
@@ -27,11 +29,13 @@ export class ConversationsService {
       state,
       assignedOperatorId,
       customerPhoneNumber,
+      labelId,
       sort = 'newest',
       limit = 20,
       offset,
       page,
     } = query;
+
     const safeLimit = Math.min(limit ?? 20, 100);
     const start = page ? (page - 1) * safeLimit : (offset ?? 0);
     const qb = this.conversationRepository.createQueryBuilder('conversation');
@@ -54,6 +58,14 @@ export class ConversationsService {
         customerPhoneNumber,
       });
     }
+    if (labelId) {
+      qb.innerJoin(
+        'conversation.conversationLabels', // relación definida en ConversationRef
+        'conversationLabel',
+        'conversationLabel.labelId = :labelId', // propiedad, no columna
+        { labelId },
+      );
+    }
 
     this.applySorting(qb, sort);
     qb.take(safeLimit).skip(start);
@@ -64,6 +76,37 @@ export class ConversationsService {
     return this.conversationRepository.findOne({
       where: { id },
     });
+  }
+
+  async findByTenantAndId(
+    tenantId: number,
+    id: number,
+  ): Promise<ConversationRef | null> {
+    return this.conversationRepository.findOne({
+      where: { tenantId, id },
+    });
+  }
+
+  async getHistoryForConversation(
+    tenantId: number,
+    id: number,
+  ): Promise<ConversationHistoryResponseDto | null> {
+    const conversation = await this.findByTenantAndId(tenantId, id);
+    if (!conversation) {
+      return null;
+    }
+    return new ConversationHistoryResponseDto(conversation);
+  }
+
+  async getContactForConversation(
+    tenantId: number,
+    id: number,
+  ): Promise<ConversationContactResponseDto | null> {
+    const conversation = await this.findByTenantAndId(tenantId, id);
+    if (!conversation) {
+      return null;
+    }
+    return new ConversationContactResponseDto(conversation);
   }
 
   async upsert(dto: CreateConversationDto): Promise<ConversationRef> {
@@ -128,33 +171,16 @@ export class ConversationsService {
     sort: ConversationSort,
   ): void {
     if (sort === 'oldest') {
-      qb.orderBy('conversation.created_at', 'ASC');
+      qb.orderBy('conversation.createdAt', 'ASC');
       return;
     }
     if (sort === 'priority') {
-      qb.orderBy('conversation.priority_score', 'DESC').addOrderBy(
-        'conversation.last_message_at',
+      qb.orderBy('conversation.priorityScore', 'DESC').addOrderBy(
+        'conversation.lastMessageAt',
         'DESC',
       );
       return;
     }
-    qb.orderBy('conversation.created_at', 'DESC');
-  }
-
-  async findByPhoneNumber(
-    tenantId: number,
-    phoneNumber: string,
-    limit = 50,
-  ): Promise<ConversationRef[]> {
-    const safeLimit = Math.min(limit ?? 50, 50);
-    const qb = this.conversationRepository.createQueryBuilder('conversation');
-    qb.where('conversation.tenant_id = :tenantId', { tenantId })
-      .andWhere('conversation.customer_phone_number = :phoneNumber', {
-        phoneNumber,
-      })
-      .orderBy('conversation.last_message_at', 'DESC')
-      .addOrderBy('conversation.created_at', 'DESC')
-      .take(safeLimit);
-    return qb.getMany();
+    qb.orderBy('conversation.createdAt', 'DESC');
   }
 }

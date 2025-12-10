@@ -1,17 +1,24 @@
 meta {
-  name: get
+  name: update label
   type: http
-  seq: 2
+  seq: 7
 }
 
-get {
-  url: {{base_url}}/inboxes
+patch {
+  url: {{base_url}}/labels/1
   body: json
   auth: inherit
 }
 
 headers {
   authorization: Bearer {{tokenOperatorInbox1}}
+}
+
+body:json {
+  {
+    "name":"VIP 123",
+    "color":"#FF5733"
+  }
 }
 
 settings {
