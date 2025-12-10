@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
 import { Operator } from './entities/operator.entity';
+import { OperatorStatusQueue } from '../operator-status/operator-status.queue';
+import { OperatorAvailability } from '../operator-status/entities/operator-status.entity';
 
 @Injectable()
 export class OperatorsService {
@@ -13,6 +15,7 @@ export class OperatorsService {
   constructor(
     @InjectRepository(Operator)
     private readonly operatorRepository: Repository<Operator>,
+    private readonly operatorStatusQueue: OperatorStatusQueue,
   ) {}
 
   async createOperator(
@@ -26,7 +29,15 @@ export class OperatorsService {
     const operator = this.operatorRepository.create(createOperatorDto);
     this.logger.log({ operator }, 'Operator created');
 
-    return this.operatorRepository.save(operator);
+    const savedOperator = await this.operatorRepository.save(operator);
+
+    this.operatorStatusQueue.enqueue(
+      savedOperator.tenantId,
+      savedOperator.id,
+      OperatorAvailability.OFFLINE,
+    );
+
+    return savedOperator;
   }
 
   async findOperatorById(id: number): Promise<Operator | null> {

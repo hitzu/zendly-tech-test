@@ -1,17 +1,17 @@
 meta {
-  name: get by phone
+  name: get by state
   type: http
-  seq: 4
+  seq: 7
 }
 
 get {
-  url: {{base_url}}/conversations?customerPhoneNumber=+15555550002
+  url: {{base_url}}/conversations?state=QUEUED
   body: json
   auth: inherit
 }
 
 params:query {
-  customerPhoneNumber: +15555550002
+  state: QUEUED
 }
 
 headers {

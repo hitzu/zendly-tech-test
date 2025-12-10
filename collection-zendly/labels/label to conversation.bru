@@ -5,9 +5,14 @@ meta {
 }
 
 post {
-  url: {{base_url}}/conversations/2/labels/1
+  url: {{base_url}}/conversations/:conversationId/labels/:labelId
   body: json
   auth: inherit
+}
+
+params:path {
+  conversationId: 5
+  labelId: 1
 }
 
 headers {

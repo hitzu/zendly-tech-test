@@ -1,25 +1,17 @@
 meta {
-  name: create
+  name: get contact
   type: http
-  seq: 3
+  seq: 11
 }
 
-post {
-  url: {{base_url}}/labels
+get {
+  url: {{base_url}}/conversations/8/contact
   body: json
   auth: inherit
 }
 
 headers {
   authorization: Bearer {{tokenAdminInbox1}}
-}
-
-body:json {
-  {
-    "inboxId":1,
-    "name":"VIP to delete",
-    "color":"#FF5733"
-  }
 }
 
 settings {

@@ -6,6 +6,7 @@ import { OperatorFactory } from '../../test/factories/operator/operator.factory'
 import { TenantFactory } from '../../test/factories/tenant/tenant.factory';
 import { OPERATOR_ROLES } from '../common/types/operator-roles.type';
 import { AppDataSource as TestDataSource } from '../config/database/data-source';
+import { OperatorStatusQueue } from '../operator-status/operator-status.queue';
 import { CreateOperatorDto } from './dto/create-operator.dto';
 import { UpdateOperatorDto } from './dto/update-operator.dto';
 import { Operator } from './entities/operator.entity';
@@ -17,14 +18,27 @@ describe('OperatorsService', () => {
   let operatorFactory: OperatorFactory;
   let tenantFactory: TenantFactory;
   let tenantRepository: Repository<Tenant>;
+  let operatorStatusQueue: { enqueue: jest.Mock };
+
+  beforeAll(async () => {
+    if (!TestDataSource.isInitialized) {
+      await TestDataSource.initialize();
+    }
+  });
 
   beforeEach(async () => {
+    operatorStatusQueue = { enqueue: jest.fn() };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OperatorsService,
         {
           provide: getRepositoryToken(Operator),
           useValue: TestDataSource.getRepository(Operator),
+        },
+        {
+          provide: OperatorStatusQueue,
+          useValue: operatorStatusQueue,
         },
       ],
     }).compile();

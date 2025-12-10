@@ -1,17 +1,18 @@
 meta {
-  name: get by phone
+  name: get paginated
   type: http
-  seq: 4
+  seq: 8
 }
 
 get {
-  url: {{base_url}}/conversations?customerPhoneNumber=+15555550002
+  url: {{base_url}}/conversations?limit=2&page=2
   body: json
   auth: inherit
 }
 
 params:query {
-  customerPhoneNumber: +15555550002
+  limit: 2
+  page: 2
 }
 
 headers {

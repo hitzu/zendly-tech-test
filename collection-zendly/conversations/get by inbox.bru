@@ -1,17 +1,17 @@
 meta {
-  name: get by phone
+  name: get by inbox
   type: http
-  seq: 4
+  seq: 5
 }
 
 get {
-  url: {{base_url}}/conversations?customerPhoneNumber=+15555550002
+  url: {{base_url}}/conversations?inboxId=1
   body: json
   auth: inherit
 }
 
 params:query {
-  customerPhoneNumber: +15555550002
+  inboxId: 1
 }
 
 headers {

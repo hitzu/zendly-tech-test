@@ -47,6 +47,15 @@ export class QueryConversationsDto {
   customerPhoneNumber?: string;
 
   @ApiPropertyOptional({
+    description: 'Exact match filter by label id',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  labelId?: number;
+
+  @ApiPropertyOptional({
     enum: CONVERSATION_SORT_OPTIONS,
     default: 'newest',
   })
