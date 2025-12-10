@@ -72,6 +72,29 @@ export class OperatorInboxSubscriptionsController {
     );
   }
 
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'List operator inbox subscriptions for an operator',
+  })
+  @ApiOkResponse({ type: [OperatorInboxSubscriptionResponseDto] })
+  async listByOperatorId(
+    @Req() req: AuthedRequest,
+  ): Promise<OperatorInboxSubscriptionResponseDto[]> {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    const operatorId = user.operatorId;
+
+    const subscriptions =
+      await this.operatorInboxSubscriptionsService.findByOperatorId(operatorId);
+    return subscriptions.map(
+      (subscription) => new OperatorInboxSubscriptionResponseDto(subscription),
+    );
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({

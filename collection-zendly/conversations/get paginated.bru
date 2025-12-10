@@ -1,0 +1,25 @@
+meta {
+  name: get paginated
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base_url}}/conversations?limit=2&page=2
+  body: json
+  auth: inherit
+}
+
+params:query {
+  limit: 2
+  page: 2
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

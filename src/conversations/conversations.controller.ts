@@ -24,6 +24,8 @@ import { Request } from 'express';
 
 import { DevTokenPayload } from '../auth/guards/dev-token.guard';
 import { ConversationsService } from './conversations.service';
+import { ConversationContactResponseDto } from './dto/conversation-contact-response.dto';
+import { ConversationHistoryResponseDto } from './dto/conversation-history-response.dto';
 import { ConversationResponseDto } from './dto/conversation-response.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
@@ -61,7 +63,11 @@ export class ConversationsController {
         state: query.state,
         assignedOperatorId: query.assignedOperatorId,
         customerPhoneNumber: query.customerPhoneNumber,
+        labelId: query.labelId,
         sort: query.sort ?? 'newest',
+        limit: query.limit,
+        offset: query.offset,
+        page: query.page,
       },
       'Listing conversations for tenant',
     );
@@ -100,6 +106,86 @@ export class ConversationsController {
       throw new NotFoundException('Conversation not found');
     }
     return new ConversationResponseDto(conversation);
+  }
+
+  @Get(':id/history')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get a conversation history snapshot (mocked) by id for tenant',
+  })
+  @ApiOkResponse({ type: ConversationHistoryResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Conversation not found',
+  })
+  async history(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+  ): Promise<ConversationHistoryResponseDto> {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    const tenantId = user.tenantId;
+    const history = await this.conversationsService.getHistoryForConversation(
+      tenantId,
+      id,
+    );
+    if (!history) {
+      this.logger.error(
+        { tenantId, conversationId: id },
+        'Conversation not found for history',
+      );
+      throw new NotFoundException('Conversation not found');
+    }
+    this.logger.log(
+      {
+        tenantId,
+        conversationId: id,
+        externalConversationId: history.id,
+      },
+      'Returning mocked conversation history',
+    );
+    return history;
+  }
+
+  @Get(':id/contact')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get a conversation contact snapshot (mocked) by id for tenant',
+  })
+  @ApiOkResponse({ type: ConversationContactResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Conversation not found',
+  })
+  async contact(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthedRequest,
+  ): Promise<ConversationContactResponseDto> {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    const tenantId = user.tenantId;
+    const contactSnapshot =
+      await this.conversationsService.getContactForConversation(tenantId, id);
+    if (!contactSnapshot) {
+      this.logger.error(
+        { tenantId, conversationId: id },
+        'Conversation not found for contact snapshot',
+      );
+      throw new NotFoundException('Conversation not found');
+    }
+    this.logger.log(
+      {
+        tenantId,
+        conversationId: id,
+        externalConversationId: contactSnapshot.contact.id,
+      },
+      'Returning mocked conversation contact snapshot',
+    );
+    return contactSnapshot;
   }
 
   @Post()

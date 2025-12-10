@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Max,
@@ -45,6 +46,13 @@ export class QueryConversationsDto {
   @IsOptional()
   @IsString()
   customerPhoneNumber?: string;
+
+  @ApiPropertyOptional({
+    description: 'Exact match filter by label id',
+  })
+  @IsOptional()
+  @IsNumber()
+  labelId?: number;
 
   @ApiPropertyOptional({
     enum: CONVERSATION_SORT_OPTIONS,

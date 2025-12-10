@@ -6,4 +6,4 @@ reviews:
   sequence_diagrams: false
   poem: false
   path_filters:
-    - '!collection-bookandsign/**'
+    - '!collection-zendly/**'

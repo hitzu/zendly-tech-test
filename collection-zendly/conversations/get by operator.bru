@@ -1,0 +1,24 @@
+meta {
+  name: get by operator
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/conversations?assignedOperatorId=9
+  body: json
+  auth: inherit
+}
+
+params:query {
+  assignedOperatorId: 9
+}
+
+headers {
+  authorization: Bearer {{tokenAdminInbox1}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
