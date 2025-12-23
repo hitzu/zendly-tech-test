@@ -15,6 +15,6 @@ export class AppController {
   @Public()
   @Get('health')
   getHealth(): string {
-    return 'Healthy';
+    return 'Healthy jiji';
   }
 }
